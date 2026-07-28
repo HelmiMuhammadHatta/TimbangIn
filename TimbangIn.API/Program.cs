@@ -39,6 +39,10 @@ builder.Services.AddScoped<IMaterialTypeService, MaterialTypeService>();
 // Register FakeWeighbridgeService as Singleton to maintain state across requests/connections
 builder.Services.AddSingleton<IWeighbridgeService, TimbangIn.Infrastructure.Services.FakeWeighbridgeService>();
 
+// ANPR Integration
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAnprService, TimbangIn.Infrastructure.Services.HttpAnprService>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<TimbangIn.Application.Mappings.MappingProfile>();
@@ -130,6 +134,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable serving static files (e.g., captured ANPR images from wwwroot)
+app.UseStaticFiles();
 
 app.UseCors("AllowFrontend");
 

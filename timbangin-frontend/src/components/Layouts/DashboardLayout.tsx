@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LogOut, Home, Truck, Users, Activity, FileText, Box, Scale } from 'lucide-react';
+import { LogOut, Home, Truck, Users, Activity, FileText, Box, Scale, Camera } from 'lucide-react';
 import axiosInstance from '../../api/axiosInstance';
 import PermissionGate from '../Guard/PermissionGate';
 
@@ -54,6 +54,12 @@ export const DashboardLayout = () => {
             <Link to="/weighbridge-monitor" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
               <Scale size={20} />
               <span>Weighbridge Monitor</span>
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission="transaction.read">
+            <Link to="/gate-monitor" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
+              <Camera size={20} />
+              <span>Gate Monitor (ANPR)</span>
             </Link>
           </PermissionGate>
           <PermissionGate permission="transaction.read">

@@ -8,6 +8,7 @@ import { Customers } from './pages/MasterData/Customers';
 import { Trucks } from './pages/MasterData/Trucks';
 import { MaterialTypes } from './pages/MasterData/MaterialTypes';
 import { WeighbridgeMonitor } from './pages/WeighbridgeMonitor/WeighbridgeMonitor';
+import GateMonitor from './pages/GateMonitor/GateMonitor';
 
 function App() {
   return (
@@ -17,13 +18,14 @@ function App() {
         
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/trucks" element={<Trucks />} />
-            <Route path="/master/material-types" element={<MaterialTypes />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/master/customers" element={<Customers />} />
+            <Route path="/master/trucks" element={<Trucks />} />
+            <Route path="/master/materials" element={<MaterialTypes />} />
           
             {/* Real-time Display */}
             <Route path="/weighbridge-monitor" element={<WeighbridgeMonitor />} />
+            <Route path="/gate-monitor" element={<GateMonitor />} />
           </Route>
         </Route>
         

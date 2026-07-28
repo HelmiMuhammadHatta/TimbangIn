@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://localhost:7154/api', // Default ASP.NET Core dev port, adjust if needed
+  baseURL: 'http://localhost:5266/api', // Matches backend launchSettings.json
   withCredentials: true, // Send HttpOnly cookies
 });
 
@@ -28,7 +28,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          'https://localhost:7154/api/auth/refresh',
+          'http://localhost:5266/api/auth/refresh',
           {},
           { withCredentials: true }
         );

@@ -13,6 +13,7 @@ namespace TimbangIn.Infrastructure.Persistence
         public DbSet<Customer> Customers { get; set; }
         public DbSet<TruckMaster> TruckMasters { get; set; }
         public DbSet<MaterialType> MaterialTypes { get; set; }
+        public DbSet<AnprDetectionLog> AnprDetectionLogs { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
 

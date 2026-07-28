@@ -20,7 +20,7 @@ namespace TimbangIn.Application.Services
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var users = await _userRepository.FindAsync(u => u.Username == request.Username);
+            var users = await _userRepository.FindAsync(u => u.Username.ToLower() == request.Username.ToLower());
             var user = users.FirstOrDefault();
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
