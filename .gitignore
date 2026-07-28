@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# .NET
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Node / JS
+node_modules/
+dist/
+build/
+.env
+.env.local
+
+# IDEs
+.idea/
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
