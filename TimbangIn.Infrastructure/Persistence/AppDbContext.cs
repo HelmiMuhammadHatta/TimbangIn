@@ -16,6 +16,7 @@ namespace TimbangIn.Infrastructure.Persistence
         public DbSet<AnprDetectionLog> AnprDetectionLogs { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<WeighTransaction> WeighTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +29,7 @@ namespace TimbangIn.Infrastructure.Persistence
             modelBuilder.Entity<MaterialType>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Permission>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<RolePermission>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<WeighTransaction>().HasQueryFilter(x => !x.IsDeleted);
 
             modelBuilder.Entity<TruckMaster>()
                 .HasIndex(t => t.PlateNumber)

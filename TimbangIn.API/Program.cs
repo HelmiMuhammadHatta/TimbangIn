@@ -16,6 +16,7 @@ using TimbangIn.Infrastructure.Identity;
 using TimbangIn.Infrastructure.Persistence;
 using TimbangIn.Infrastructure.Repositories;
 using FluentValidation.AspNetCore;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ITruckMasterService, TruckMasterService>();
 builder.Services.AddScoped<IMaterialTypeService, MaterialTypeService>();
+builder.Services.AddScoped<IWeighTransactionService, WeighTransactionService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IDashboardNotifier, TimbangIn.API.Services.DashboardNotifier>();
+builder.Services.AddScoped<IReportService, TimbangIn.Infrastructure.Services.ReportService>();
 
 // Register FakeWeighbridgeService as Singleton to maintain state across requests/connections
 builder.Services.AddSingleton<IWeighbridgeService, TimbangIn.Infrastructure.Services.FakeWeighbridgeService>();
@@ -122,6 +127,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+QuestPDF.Settings.License = LicenseType.Community;
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -145,6 +152,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<TimbangIn.API.Hubs.WeighbridgeHub>("/hubs/weighbridge");
+app.MapHub<TimbangIn.API.Hubs.DashboardHub>("/hubs/dashboard");
 
 // Auto-Migration and Data Seeding
 using (var scope = app.Services.CreateScope())

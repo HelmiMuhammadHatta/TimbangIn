@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LogOut, Home, Truck, Users, Activity, FileText, Box, Scale, Camera } from 'lucide-react';
+import { LogOut, Home, Truck, Users, Activity, FileText, Box, Scale, Camera, ArrowRightCircle, ArrowLeftCircle, History } from 'lucide-react';
 import axiosInstance from '../../api/axiosInstance';
 import PermissionGate from '../Guard/PermissionGate';
 
@@ -62,10 +62,28 @@ export const DashboardLayout = () => {
               <span>Gate Monitor (ANPR)</span>
             </Link>
           </PermissionGate>
+          <PermissionGate permission="transaction.create">
+            <Link to="/weigh-in" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
+              <ArrowRightCircle size={20} />
+              <span>Timbang Masuk</span>
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission="transaction.create">
+            <Link to="/weigh-out" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
+              <ArrowLeftCircle size={20} />
+              <span>Timbang Keluar</span>
+            </Link>
+          </PermissionGate>
           <PermissionGate permission="transaction.read">
-            <Link to="/" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Activity size={20} />
-              <span>Transaksi Timbang</span>
+            <Link to="/transactions" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
+              <History size={20} />
+              <span>Riwayat Transaksi</span>
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission="transaction.read">
+            <Link to="/reports" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
+              <FileText size={20} />
+              <span>Laporan</span>
             </Link>
           </PermissionGate>
         </nav>

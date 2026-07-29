@@ -7,8 +7,12 @@ import { ProtectedRoute } from './components/Routes/ProtectedRoute';
 import { Customers } from './pages/MasterData/Customers';
 import { Trucks } from './pages/MasterData/Trucks';
 import { MaterialTypes } from './pages/MasterData/MaterialTypes';
+import { Reports } from './pages/Reports/Reports';
 import { WeighbridgeMonitor } from './pages/WeighbridgeMonitor/WeighbridgeMonitor';
 import GateMonitor from './pages/GateMonitor/GateMonitor';
+import { WeighIn } from './pages/Transactions/WeighIn';
+import { WeighOut } from './pages/Transactions/WeighOut';
+import { TransactionHistory } from './pages/Transactions/TransactionHistory';
 
 function App() {
   return (
@@ -22,10 +26,16 @@ function App() {
             <Route path="/master/customers" element={<Customers />} />
             <Route path="/master/trucks" element={<Trucks />} />
             <Route path="/master/materials" element={<MaterialTypes />} />
+            <Route path="reports" element={<Reports />} />
           
             {/* Real-time Display */}
             <Route path="/weighbridge-monitor" element={<WeighbridgeMonitor />} />
             <Route path="/gate-monitor" element={<GateMonitor />} />
+
+            {/* Transactions */}
+            <Route path="/weigh-in" element={<WeighIn />} />
+            <Route path="/weigh-out" element={<WeighOut />} />
+            <Route path="/transactions" element={<TransactionHistory />} />
           </Route>
         </Route>
         

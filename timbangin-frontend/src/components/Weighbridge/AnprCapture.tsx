@@ -12,7 +12,11 @@ interface AnprResult {
   matchedTruck?: any;
 }
 
-export const AnprCapture = () => {
+interface AnprCaptureProps {
+  onDetectResult?: (plateNumber: string, photoPath: string) => void;
+}
+
+export const AnprCapture: React.FC<AnprCaptureProps> = ({ onDetectResult }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
@@ -85,6 +89,9 @@ export const AnprCapture = () => {
           if (response.data.success) {
             setResult(response.data.data);
             setManualPlate(response.data.data.plateNumber || '');
+            if (onDetectResult) {
+                onDetectResult(response.data.data.plateNumber, '');
+            }
           } else {
             setError(response.data.message || 'Gagal deteksi ANPR');
           }

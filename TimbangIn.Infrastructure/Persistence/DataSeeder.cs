@@ -70,7 +70,7 @@ namespace TimbangIn.Infrastructure.Persistence
                     "customer.read", "customer.create", "customer.update", "customer.delete",
                     "truck.read", "truck.create", "truck.update", "truck.delete",
                     "material.read", "material.create", "material.update", "material.delete",
-                    "transaction.read", "transaction.create", "transaction.update", "transaction.delete"
+                    "transaction.read", "transaction.create", "transaction.update", "transaction.delete", "transaction.cancel"
                 };
 
                 var permissions = permissionNames.Select(name => new Permission { Name = name }).ToList();
