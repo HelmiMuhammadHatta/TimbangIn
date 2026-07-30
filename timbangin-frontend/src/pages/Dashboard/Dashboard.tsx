@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import * as signalR from '@microsoft/signalr';
 import { 
@@ -26,11 +26,11 @@ export const Dashboard = () => {
 
     const fetchSummary = async () => {
         try {
-            const res = await axiosInstance.get('/api/dashboard/summary');
+            const res = await axiosInstance.get('/dashboard/summary');
             setSummary(res.data.data);
             
             // Also fetch pending transactions for "Truck di Lokasi" panel
-            const pendingRes = await axiosInstance.get('/api/weightransactions/pending');
+            const pendingRes = await axiosInstance.get('/weightransactions/pending');
             setTrucksOnSiteList(pendingRes.data.data);
         } catch (err) {
             console.error('Failed to fetch dashboard summary', err);

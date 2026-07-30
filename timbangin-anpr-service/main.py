@@ -86,13 +86,26 @@ async def detect_plate(image: UploadFile = File(...)):
     # If a rectangular contour was found, crop and OCR that specific area
     if location is not None:
         mask = np.zeros(gray.shape, np.uint8)
-        new_image = cv2.drawContours(mask, [location], 0, 255, -1)
-        new_image = cv2.bitwise_and(img, img, mask=mask)
+        cv2.drawContours(mask, [location], 0, 255, -1)
         
         (x, y) = np.where(mask == 255)
         (topx, topy) = (np.min(x), np.min(y))
         (bottomx, bottomy) = (np.max(x), np.max(y))
-        cropped = gray[topx:bottomx+1, topy:bottomy+1]
+        
+        # Add 20% padding
+        h = bottomx - topx
+        w = bottomy - topy
+        padding_y = int(h * 0.2)
+        padding_x = int(w * 0.2)
+        
+        # Ensure padding does not exceed image bounds
+        img_h, img_w = gray.shape
+        topx_padded = max(0, topx - padding_y)
+        bottomx_padded = min(img_h - 1, bottomx + padding_y)
+        topy_padded = max(0, topy - padding_x)
+        bottomy_padded = min(img_w - 1, bottomy + padding_x)
+        
+        cropped = gray[topx_padded:bottomx_padded+1, topy_padded:bottomy_padded+1]
         
         # Run OCR on cropped image
         result = reader.readtext(cropped)
@@ -100,30 +113,41 @@ async def detect_plate(image: UploadFile = File(...)):
         # Fallback: Run OCR on the whole image (slower, but works if contour detection failed)
         result = reader.readtext(gray)
 
-    # Process OCR results
-    best_candidate = ""
-    best_conf = 0.0
+    # Process OCR results: Merge all detected text blocks from left to right
+    # result format: [(bbox, text, conf), ...]
+    # bbox format: [[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
+    
+    # Sort by the minimum X coordinate of the bounding box
+    result.sort(key=lambda item: min(pt[0] for pt in item[0]))
+    
+    all_blocks = []
+    merged_text = ""
+    conf_sum = 0.0
+    valid_blocks = 0
     
     for (bbox, text, conf) in result:
+        # Log all raw detected blocks
+        all_blocks.append({
+            "text": text,
+            "confidence": round(float(conf), 4)
+        })
+        
         cleaned = clean_plate_text(text)
-        if len(cleaned) >= 4: # Plates are at least 4 chars long (e.g. B1AA)
-            # Prioritize matches that fit the plate regex format
-            if is_valid_plate_format(cleaned):
-                if conf > best_conf or best_candidate == "":
-                    best_candidate = cleaned
-                    best_conf = float(conf)
-            else:
-                # If no valid format found yet, just keep the highest confidence long string
-                if best_candidate == "" and conf > best_conf:
-                    best_candidate = cleaned
-                    best_conf = float(conf)
+        if cleaned: # If not empty after cleaning
+            merged_text += cleaned
+            conf_sum += float(conf)
+            valid_blocks += 1
+
+    best_candidate = merged_text
+    best_conf = (conf_sum / valid_blocks) if valid_blocks > 0 else 0.0
 
     processing_time_ms = int((time.time() - start_time) * 1000)
 
     return JSONResponse({
         "plateNumber": best_candidate,
         "confidence": round(best_conf, 4),
-        "processingTimeMs": processing_time_ms
+        "processingTimeMs": processing_time_ms,
+        "allDetectedTextBlocks": all_blocks
     })
 
 if __name__ == "__main__":

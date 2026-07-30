@@ -1,7 +1,7 @@
 import React from 'react';
-import { Outlet, Navigate, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LogOut, Home, Truck, Users, Activity, FileText, Box, Scale, Camera, ArrowRightCircle, ArrowLeftCircle, History } from 'lucide-react';
+import { LogOut, Home, Truck, Users, FileText, Box, Scale, Camera, ArrowRightCircle, ArrowLeftCircle, History } from 'lucide-react';
 import axiosInstance from '../../api/axiosInstance';
 import PermissionGate from '../Guard/PermissionGate';
 

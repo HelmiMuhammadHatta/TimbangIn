@@ -42,11 +42,11 @@ namespace TimbangIn.Infrastructure.Persistence
                 {
                     var truckMasters = new List<TruckMaster>
                     {
-                        new TruckMaster { PlateNumber = "B 1234 CD", DriverName = "Budi", MaxCapacityKg = 10000, CustomerId = customers[0].Id },
-                        new TruckMaster { PlateNumber = "B 5678 EF", DriverName = "Andi", MaxCapacityKg = 15000, CustomerId = customers[0].Id },
-                        new TruckMaster { PlateNumber = "D 9012 GH", DriverName = "Cipto", MaxCapacityKg = 8000, CustomerId = customers[1].Id },
-                        new TruckMaster { PlateNumber = "D 3456 IJ", DriverName = "Dodi", MaxCapacityKg = 12000, CustomerId = customers[1].Id },
-                        new TruckMaster { PlateNumber = "L 7890 KL", DriverName = "Eko", MaxCapacityKg = 20000, CustomerId = customers[2].Id }
+                        new TruckMaster { PlateNumber = "B 1234 CD", PlateNumberNormalized = "B1234CD", DriverName = "Budi", MaxCapacityKg = 10000, CustomerId = customers[0].Id },
+                        new TruckMaster { PlateNumber = "B 5678 EF", PlateNumberNormalized = "B5678EF", DriverName = "Andi", MaxCapacityKg = 15000, CustomerId = customers[0].Id },
+                        new TruckMaster { PlateNumber = "D 9012 GH", PlateNumberNormalized = "D9012GH", DriverName = "Cipto", MaxCapacityKg = 8000, CustomerId = customers[1].Id },
+                        new TruckMaster { PlateNumber = "D 3456 IJ", PlateNumberNormalized = "D3456IJ", DriverName = "Dodi", MaxCapacityKg = 12000, CustomerId = customers[1].Id },
+                        new TruckMaster { PlateNumber = "L 7890 KL", PlateNumberNormalized = "L7890KL", DriverName = "Eko", MaxCapacityKg = 20000, CustomerId = customers[2].Id }
                     };
                     context.TruckMasters.AddRange(truckMasters);
                 }

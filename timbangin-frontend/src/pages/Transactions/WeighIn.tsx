@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AnprCapture } from '../../components/Weighbridge/AnprCapture';
-import { WeighbridgeMonitor } from '../WeighbridgeMonitor/WeighbridgeMonitor';
 import axiosInstance from '../../api/axiosInstance';
 import { TicketPrint } from '../../components/Weighbridge/TicketPrint';
 
@@ -28,9 +27,9 @@ export const WeighIn: React.FC = () => {
     const fetchMasterData = async () => {
         try {
             const [custRes, matRes, truckRes] = await Promise.all([
-                axiosInstance.get('/api/customers?pageSize=100'),
-                axiosInstance.get('/api/materialtypes?pageSize=100'),
-                axiosInstance.get('/api/trucks?pageSize=100')
+                axiosInstance.get('/customers?pageSize=100'),
+                axiosInstance.get('/materialtypes?pageSize=100'),
+                axiosInstance.get('/trucks?pageSize=100')
             ]);
             setCustomers(custRes.data.data.items);
             setMaterials(matRes.data.data.items);
@@ -40,7 +39,7 @@ export const WeighIn: React.FC = () => {
         }
     };
 
-    const handleAnprResult = (plateNumber: string, photoPath: string) => {
+    const handleAnprResult = (plateNumber: string, _photoPath: string) => {
         const truck = trucks.find(t => t.plateNumber.replace(/\s+/g, '') === plateNumber.replace(/\s+/g, ''));
         if (truck) {
             setSelectedTruckId(truck.id);
@@ -72,7 +71,7 @@ export const WeighIn: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            const res = await axiosInstance.post('/api/weightransactions/start', {
+            const res = await axiosInstance.post('/weightransactions/start', {
                 truckId: selectedTruckId,
                 customerId: selectedCustomerId,
                 materialTypeId: selectedMaterialId,

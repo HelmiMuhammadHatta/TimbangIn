@@ -52,6 +52,7 @@ export const AnprCapture: React.FC<AnprCaptureProps> = ({ onDetectResult }) => {
   useEffect(() => {
     startCamera();
     return () => stopCamera();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const captureAndDetect = useCallback(async () => {
@@ -95,13 +96,14 @@ export const AnprCapture: React.FC<AnprCaptureProps> = ({ onDetectResult }) => {
           } else {
             setError(response.data.message || 'Gagal deteksi ANPR');
           }
-        } catch (err: any) {
+        } catch {
           setError('Terjadi kesalahan jaringan atau server ANPR mati.');
         } finally {
           setIsCapturing(false);
         }
       }, 'image/jpeg', 0.8);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

@@ -45,7 +45,7 @@ namespace TimbangIn.API.Middleware
             {
                 success = false,
                 message = exception.Message,
-                data = (object)null,
+                data = (object?)null,
                 errors = new[] { exception.Message }
             };
 

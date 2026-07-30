@@ -23,14 +23,14 @@ export const WeighOut: React.FC = () => {
 
     const fetchPendingTransactions = async () => {
         try {
-            const res = await axiosInstance.get('/api/weightransactions/pending');
+            const res = await axiosInstance.get('/weightransactions/pending');
             setPendingTransactions(res.data.data);
         } catch (err) {
             console.error('Failed to load pending transactions', err);
         }
     };
 
-    const handleAnprResult = (plateNumber: string, photoPath: string) => {
+    const handleAnprResult = (plateNumber: string, _photoPath: string) => {
         const found = pendingTransactions.find(t => t.truckPlateNumber.replace(/\s+/g, '') === plateNumber.replace(/\s+/g, ''));
         if (found) {
             setSelectedTransaction(found);

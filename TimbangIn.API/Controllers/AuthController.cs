@@ -31,7 +31,8 @@ namespace TimbangIn.API.Controllers
                 {
                     token = response.Token,
                     username = response.Username,
-                    role = response.Role
+                    role = response.Role,
+                    permissions = response.Permissions
                 }
             });
         }
@@ -57,7 +58,8 @@ namespace TimbangIn.API.Controllers
                     {
                         token = response.Token,
                         username = response.Username,
-                        role = response.Role
+                        role = response.Role,
+                        permissions = response.Permissions
                     }
                 });
             }
@@ -79,7 +81,7 @@ namespace TimbangIn.API.Controllers
 
             Response.Cookies.Delete("refreshToken");
 
-            return Ok(new { success = true, message = "Logged out successfully", data = (object)null });
+            return Ok(new { success = true, message = "Logged out successfully", data = (object?)null });
         }
 
         private void SetRefreshTokenCookie(string refreshToken)

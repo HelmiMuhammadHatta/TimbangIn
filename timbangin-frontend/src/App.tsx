@@ -22,11 +22,11 @@ function App() {
         
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/master/customers" element={<Customers />} />
-            <Route path="/master/trucks" element={<Trucks />} />
-            <Route path="/master/materials" element={<MaterialTypes />} />
-            <Route path="reports" element={<Reports />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/trucks" element={<Trucks />} />
+            <Route path="/material-types" element={<MaterialTypes />} />
+            <Route path="/reports" element={<Reports />} />
           
             {/* Real-time Display */}
             <Route path="/weighbridge-monitor" element={<WeighbridgeMonitor />} />

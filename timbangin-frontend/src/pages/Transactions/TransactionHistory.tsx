@@ -18,6 +18,7 @@ export const TransactionHistory: React.FC = () => {
 
     useEffect(() => {
         fetchTransactions();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, statusFilter]);
 
     // Handle search debounce or manual trigger, here we'll just use a button or enter key for simplicity.

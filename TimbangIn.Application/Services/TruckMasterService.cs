@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TimbangIn.Application.DTOs.Common;
 using TimbangIn.Application.DTOs.Master;
 using TimbangIn.Application.Interfaces;
+using TimbangIn.Application.Utils;
 using TimbangIn.Domain.Entities;
 using TimbangIn.Domain.Interfaces;
 
@@ -63,6 +64,7 @@ namespace TimbangIn.Application.Services
         public async Task<TruckDto> CreateTruckAsync(TruckCreateDto dto)
         {
             var entity = _mapper.Map<TruckMaster>(dto);
+            entity.PlateNumberNormalized = entity.PlateNumber.NormalizePlateNumber();
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
             return await GetTruckByIdAsync(entity.Id);
@@ -74,6 +76,7 @@ namespace TimbangIn.Application.Services
                 ?? throw new KeyNotFoundException("Truck not found.");
 
             _mapper.Map(dto, entity);
+            entity.PlateNumberNormalized = entity.PlateNumber.NormalizePlateNumber();
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
             return await GetTruckByIdAsync(entity.Id);

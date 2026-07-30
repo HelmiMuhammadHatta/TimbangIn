@@ -27,11 +27,12 @@ export const Reports = () => {
 
     useEffect(() => {
         // Fetch lookup data
-        axiosInstance.get('/api/customers?pageNumber=1&pageSize=100').then(res => setCustomers(res.data.data.items));
-        axiosInstance.get('/api/materialtypes?pageNumber=1&pageSize=100').then(res => setMaterials(res.data.data.items));
+        axiosInstance.get('/customers?pageNumber=1&pageSize=100').then(res => setCustomers(res.data.data.items));
+        axiosInstance.get('/materialtypes?pageNumber=1&pageSize=100').then(res => setMaterials(res.data.data.items));
         
         // Auto load initial data
         handleSearch();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSearch = async () => {

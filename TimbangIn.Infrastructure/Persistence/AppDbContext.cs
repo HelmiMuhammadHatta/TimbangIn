@@ -34,6 +34,9 @@ namespace TimbangIn.Infrastructure.Persistence
             modelBuilder.Entity<TruckMaster>()
                 .HasIndex(t => t.PlateNumber)
                 .IsUnique();
+            modelBuilder.Entity<TruckMaster>()
+                .HasIndex(t => t.PlateNumberNormalized)
+                .IsUnique();
                 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)

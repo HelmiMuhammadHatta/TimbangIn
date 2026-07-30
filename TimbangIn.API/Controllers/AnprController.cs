@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TimbangIn.Application.DTOs.Master;
 using TimbangIn.Application.Interfaces;
+using TimbangIn.Application.Utils;
 using TimbangIn.Domain.Entities;
 using TimbangIn.Domain.Interfaces;
 
@@ -75,8 +76,9 @@ namespace TimbangIn.API.Controllers
                 // For simplicity in this demo, let's fetch all and LINQ it, or you'd normally add a GetByPlateNumber to ITruckMasterService.
                 var allTrucks = await _truckMasterService.GetTrucksAsync(new Application.DTOs.Common.PaginationFilter { PageNumber = 1, PageSize = 10000 }, null);
                 
+                var normalizedDetected = anprResult.PlateNumber.NormalizePlateNumber();
                 var matchedTruck = allTrucks.Items.FirstOrDefault(t => 
-                    t.PlateNumber.Replace(" ", "").Equals(anprResult.PlateNumber, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(t.PlateNumberNormalized, normalizedDetected, StringComparison.OrdinalIgnoreCase));
 
                 if (matchedTruck != null)
                 {
