@@ -92,11 +92,11 @@ async def detect_plate(image: UploadFile = File(...)):
         (topx, topy) = (np.min(x), np.min(y))
         (bottomx, bottomy) = (np.max(x), np.max(y))
         
-        # Add 20% padding
+        # Add 30% padding to avoid cutting off edge characters
         h = bottomx - topx
         w = bottomy - topy
-        padding_y = int(h * 0.2)
-        padding_x = int(w * 0.2)
+        padding_y = int(h * 0.3)
+        padding_x = int(w * 0.3)
         
         # Ensure padding does not exceed image bounds
         img_h, img_w = gray.shape
@@ -107,7 +107,16 @@ async def detect_plate(image: UploadFile = File(...)):
         
         cropped = gray[topx_padded:bottomx_padded+1, topy_padded:bottomy_padded+1]
         
-        # Run OCR on cropped image
+        # Enhance plate image for clearer OCR reading
+        # 1. Resize to make characters larger (EasyOCR performs better on larger text)
+        cropped = cv2.resize(cropped, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+        # 2. Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to improve contrast
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        cropped = clahe.apply(cropped)
+        # 3. Apply slight blur to remove upscaling noise
+        cropped = cv2.GaussianBlur(cropped, (3, 3), 0)
+        
+        # Run OCR on the enhanced cropped image
         result = reader.readtext(cropped)
     else:
         # Fallback: Run OCR on the whole image (slower, but works if contour detection failed)
