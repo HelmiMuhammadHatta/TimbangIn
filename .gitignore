@@ -23,6 +23,18 @@ build/
 .idea/
 .vscode/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Uploads & Captures
+**/wwwroot/anpr-captures/*
+!**/wwwroot/anpr-captures/.gitkeep
+
 # OS Files
 .DS_Store
 Thumbs.db

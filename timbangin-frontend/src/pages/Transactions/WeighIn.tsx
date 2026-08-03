@@ -39,14 +39,32 @@ export const WeighIn: React.FC = () => {
         }
     };
 
-    const handleAnprResult = (plateNumber: string, _photoPath: string) => {
-        const truck = trucks.find(t => t.plateNumber.replace(/\s+/g, '') === plateNumber.replace(/\s+/g, ''));
+    const handleAnprResult = async (plateNumber: string, _photoPath: string) => {
+        const cleanTarget = plateNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        const truck = trucks.find(t => 
+            t.plateNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase() === cleanTarget ||
+            (t.plateNumberNormalized && t.plateNumberNormalized.toUpperCase() === cleanTarget)
+        );
+
         if (truck) {
             setSelectedTruckId(truck.id);
             setSelectedCustomerId(truck.customerId);
             setError('');
         } else {
-            setError(`Truk dengan plat ${plateNumber} tidak ditemukan di Master Data.`);
+            try {
+                const res = await axiosInstance.get(`/trucks/by-plate/${cleanTarget}`);
+                if (res.data.success && res.data.data) {
+                    const t = res.data.data;
+                    setSelectedTruckId(t.id);
+                    setSelectedCustomerId(t.customerId);
+                    setError('');
+                    setTrucks(prev => prev.some(x => x.id === t.id) ? prev : [...prev, t]);
+                } else {
+                    setError(`Truk dengan plat ${plateNumber} tidak ditemukan di Master Data.`);
+                }
+            } catch {
+                setError(`Truk dengan plat ${plateNumber} tidak ditemukan di Master Data.`);
+            }
         }
     };
 

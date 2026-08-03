@@ -45,7 +45,7 @@ export const Reports = () => {
             if (filter.materialTypeId) params.append('materialTypeId', filter.materialTypeId);
             if (filter.status) params.append('status', filter.status);
 
-            const res = await axiosInstance.get(`/api/reports/transactions?${params.toString()}`);
+            const res = await axiosInstance.get(`/reports/transactions?${params.toString()}`);
             setSummary(res.data.data.summary);
             setTransactions(res.data.data.transactions);
         } catch (error) {
@@ -64,7 +64,7 @@ export const Reports = () => {
             if (filter.materialTypeId) params.append('materialTypeId', filter.materialTypeId);
             if (filter.status) params.append('status', filter.status);
 
-            const res = await axiosInstance.get(`/api/reports/transactions/export-excel?${params.toString()}`, {
+            const res = await axiosInstance.get(`/reports/transactions/export-excel?${params.toString()}`, {
                 responseType: 'blob'
             });
 
@@ -89,7 +89,7 @@ export const Reports = () => {
             if (filter.materialTypeId) params.append('materialTypeId', filter.materialTypeId);
             if (filter.status) params.append('status', filter.status);
 
-            const res = await axiosInstance.get(`/api/reports/transactions/export-pdf?${params.toString()}`, {
+            const res = await axiosInstance.get(`/reports/transactions/export-pdf?${params.toString()}`, {
                 responseType: 'blob'
             });
 

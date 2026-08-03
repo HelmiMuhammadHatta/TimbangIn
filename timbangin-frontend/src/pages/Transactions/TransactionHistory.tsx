@@ -31,7 +31,7 @@ export const TransactionHistory: React.FC = () => {
     const fetchTransactions = async () => {
         setLoading(true);
         try {
-            let url = `/api/weightransactions?pageNumber=${page}&pageSize=10`;
+            let url = `/weightransactions?pageNumber=${page}&pageSize=10`;
             if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
             if (statusFilter) url += `&status=${statusFilter}`;
 
@@ -63,7 +63,7 @@ export const TransactionHistory: React.FC = () => {
         }
         
         try {
-            await axiosInstance.post(`/api/weightransactions/${id}/cancel`, { notes });
+            await axiosInstance.post(`/weightransactions/${id}/cancel`, { notes });
             alert("Transaksi dibatalkan.");
             fetchTransactions();
         } catch (err: any) {

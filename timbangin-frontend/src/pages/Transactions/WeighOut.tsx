@@ -31,7 +31,10 @@ export const WeighOut: React.FC = () => {
     };
 
     const handleAnprResult = (plateNumber: string, _photoPath: string) => {
-        const found = pendingTransactions.find(t => t.truckPlateNumber.replace(/\s+/g, '') === plateNumber.replace(/\s+/g, ''));
+        const cleanTarget = plateNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        const found = pendingTransactions.find(t => 
+            (t.truckPlateNumber && t.truckPlateNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase() === cleanTarget)
+        );
         if (found) {
             setSelectedTransaction(found);
             setError('');
@@ -61,7 +64,7 @@ export const WeighOut: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            const res = await axiosInstance.post(`/api/weightransactions/${selectedTransaction.id}/complete`, {
+            const res = await axiosInstance.post(`/weightransactions/${selectedTransaction.id}/complete`, {
                 weighOutKg: currentWeight,
                 weighOutPhotoPath: '' // Pass photo path if you store ANPR state locally
             });

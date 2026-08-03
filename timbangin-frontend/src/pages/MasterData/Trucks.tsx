@@ -224,10 +224,12 @@ export const Trucks = () => {
             <input 
               type="text" 
               required
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+              placeholder="Contoh: R 3905 DW atau R3905DW"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm font-mono uppercase rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
               value={formData.plateNumber}
-              onChange={(e) => setFormData({...formData, plateNumber: e.target.value})}
+              onChange={(e) => setFormData({...formData, plateNumber: e.target.value.toUpperCase()})}
             />
+            <p className="mt-1 text-xs text-gray-500">Bisa diinput dengan atau tanpa spasi (misal: R 3905 DW atau R3905DW)</p>
           </div>
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-900">Nama Sopir</label>

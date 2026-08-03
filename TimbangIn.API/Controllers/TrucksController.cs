@@ -35,6 +35,17 @@ namespace TimbangIn.API.Controllers
             return Ok(new ApiResponse<TruckDto> { Success = true, Data = result });
         }
 
+        [HttpGet("by-plate/{plateNumber}")]
+        [RequirePermission("truck.read")]
+        public async Task<IActionResult> GetByPlate(string plateNumber)
+        {
+            var result = await _service.GetByPlateNumberAsync(plateNumber);
+            if (result == null)
+                return Ok(new ApiResponse<TruckDto?> { Success = false, Message = "Truk tidak ditemukan di master data." });
+
+            return Ok(new ApiResponse<TruckDto> { Success = true, Data = result });
+        }
+
         [HttpPost]
         [RequirePermission("truck.create")]
         public async Task<IActionResult> Post([FromBody] TruckCreateDto dto)

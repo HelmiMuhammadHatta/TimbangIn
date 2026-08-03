@@ -44,7 +44,15 @@ namespace TimbangIn.API.Controllers
             if (image == null || image.Length == 0)
                 return BadRequest(new { success = false, message = "No image uploaded." });
 
-            // 1. Save snapshot to wwwroot/anpr-captures
+            // 1. Read image bytes
+            byte[] imageBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                await image.CopyToAsync(memoryStream);
+                imageBytes = memoryStream.ToArray();
+            }
+
+            // 2. Save snapshot to wwwroot/anpr-captures
             var captureFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "anpr-captures");
             if (!Directory.Exists(captureFolder))
                 Directory.CreateDirectory(captureFolder);
@@ -53,32 +61,16 @@ namespace TimbangIn.API.Controllers
             var filePath = Path.Combine(captureFolder, fileName);
             var relativeUrl = $"/anpr-captures/{fileName}";
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(stream);
-            }
+            await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
 
-            // 2. Call Python ANPR Service
-            byte[] imageBytes;
-            using (var memoryStream = new MemoryStream())
-            {
-                image.CopyTo(memoryStream);
-                imageBytes = memoryStream.ToArray();
-            }
-
+            // 3. Call Python ANPR Service
             var anprResult = await _anprService.DetectPlateAsync(imageBytes, image.FileName);
             anprResult.ImageUrl = relativeUrl;
 
-            // 3. Match with TruckMaster if plate was detected
+            // 4. Match with TruckMaster if plate was detected
             if (!string.IsNullOrEmpty(anprResult.PlateNumber))
             {
-                // Note: GetPagedAsync expects PaginationFilter. We could just get all or add a specific get by PlateNumber to the service.
-                // For simplicity in this demo, let's fetch all and LINQ it, or you'd normally add a GetByPlateNumber to ITruckMasterService.
-                var allTrucks = await _truckMasterService.GetTrucksAsync(new Application.DTOs.Common.PaginationFilter { PageNumber = 1, PageSize = 10000 }, null);
-                
-                var normalizedDetected = anprResult.PlateNumber.NormalizePlateNumber();
-                var matchedTruck = allTrucks.Items.FirstOrDefault(t => 
-                    string.Equals(t.PlateNumberNormalized, normalizedDetected, StringComparison.OrdinalIgnoreCase));
+                var matchedTruck = await _truckMasterService.GetByPlateNumberAsync(anprResult.PlateNumber);
 
                 if (matchedTruck != null)
                 {
@@ -88,7 +80,7 @@ namespace TimbangIn.API.Controllers
                 }
             }
 
-            // 4. Log detection
+            // 5. Log detection
             var logEntry = new AnprDetectionLog
             {
                 PlateNumber = anprResult.PlateNumber,

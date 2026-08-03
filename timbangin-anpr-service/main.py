@@ -11,41 +11,100 @@ app = FastAPI(title="TimbangIn ANPR Service")
 
 # Initialize EasyOCR reader once at startup
 print("Loading EasyOCR model...")
-# Setting gpu=False ensures it runs on any machine (laptop CPU). 
-# Change to gpu=True if CUDA is available for much faster processing.
 reader = easyocr.Reader(['en'], gpu=False)
 print("EasyOCR model loaded.")
 
 def clean_plate_text(text: str) -> str:
-    """
-    Cleans up the OCR text to match Indonesian plate format logic.
-    - Remove special characters and spaces
-    - Standard format: 1-2 letters, 1-4 numbers, 1-3 letters.
-    - Example: B1234ABC
-    """
-    # Remove all non-alphanumeric characters
-    cleaned = re.sub(r'[^A-Z0-9]', '', text.upper())
-    
-    # Simple heuristic to fix common OCR errors in plates
-    # e.g., '0' read as 'O' or 'O' read as '0' depending on position
-    # (A full regex-based correction requires knowing the exact segments, 
-    # but a simple replace helps in edge cases if implemented carefully).
-    
-    return cleaned
+    """Removes non-alphanumeric characters and converts to uppercase."""
+    return re.sub(r'[^A-Z0-9]', '', text.upper())
 
-def is_valid_plate_format(text: str) -> bool:
+def format_plate(raw_text: str) -> str:
+    """Formats a plate string into standard Indonesian format (e.g., 'R 3905 DW')."""
+    clean = clean_plate_text(raw_text)
+    match = re.match(r'^([A-Z]{1,2})([0-9]{1,4})([A-Z]{0,3})$', clean)
+    if match:
+        p, n, s = match.groups()
+        return f"{p} {n} {s}".strip()
+    return clean
+
+def score_and_extract_plate(detected_blocks):
     """
-    Check if the string loosely matches an Indonesian license plate.
-    ^[A-Z]{1,2}[0-9]{1,4}[A-Z]{0,3}$
+    Evaluates detected text blocks (each: text, conf, min_x) and finds
+    the best Indonesian license plate match.
     """
-    pattern = r'^[A-Z]{1,2}[0-9]{1,4}[A-Z]{0,3}$'
-    return bool(re.match(pattern, text))
+    if not detected_blocks:
+        return ("", "", 0.0, "none")
+
+    # Sort left to right
+    detected_blocks.sort(key=lambda x: x[2])
+    
+    candidates = []
+    
+    # Check merged adjacent blocks first (all text combined left-to-right)
+    joined_raw = " ".join([b[0] for b in detected_blocks])
+    joined_clean = clean_plate_text(joined_raw)
+    
+    # Priority 1: Full plate match in merged text: Prefix (1-2) + Number (1-4) + Suffix (1-3)
+    m_full = re.search(r'([A-Z]{1,2})([0-9]{1,4})([A-Z]{1,3})', joined_clean)
+    if m_full:
+        p, n, s = m_full.groups()
+        avg_conf = sum(b[1] for b in detected_blocks) / len(detected_blocks)
+        score = min(1.0, avg_conf + 0.35)  # Significant priority bonus for complete 3-segment plate
+        candidates.append((f"{p} {n} {s}", f"{p}{n}{s}", score, "merged_full_plate"))
+
+    # Priority 2: Full plate match in a single block
+    for text, conf, _ in detected_blocks:
+        clean = clean_plate_text(text)
+        m = re.match(r'^([A-Z]{1,2})([0-9]{1,4})([A-Z]{1,3})$', clean)
+        if m:
+            p, n, s = m.groups()
+            score = min(1.0, conf + 0.3)
+            candidates.append((f"{p} {n} {s}", clean, score, "single_block_full"))
+
+    # Priority 3: Partial plate (Prefix + Number only) - lower base score
+    for text, conf, _ in detected_blocks:
+        clean = clean_plate_text(text)
+        m2 = re.match(r'^([A-Z]{1,2})([0-9]{1,4})$', clean)
+        if m2:
+            p, n = m2.groups()
+            candidates.append((f"{p} {n}", clean, conf * 0.7, "single_block_partial"))
+
+    m_partial = re.search(r'([A-Z]{1,2})([0-9]{1,4})', joined_clean)
+    if m_partial and not m_full:
+        p, n = m_partial.groups()
+        avg_conf = sum(b[1] for b in detected_blocks) / len(detected_blocks)
+        candidates.append((f"{p} {n}", f"{p}{n}", avg_conf * 0.65, "merged_partial"))
+
+    # Priority 4: Fallback
+    if not candidates and detected_blocks:
+        avg_conf = sum(b[1] for b in detected_blocks) / len(detected_blocks)
+        candidates.append((format_plate(joined_clean), joined_clean, avg_conf * 0.5, "raw_fallback"))
+
+    # Rank by score
+    candidates.sort(key=lambda x: x[2], reverse=True)
+    return candidates[0] if candidates else ("", "", 0.0, "none")
+
+def preprocess_image_for_ocr(img_gray):
+    """Generates enhanced image variations for robust OCR detection."""
+    h, w = img_gray.shape
+    
+    # Upscale if small
+    if h < 120 or w < 300:
+        scale = max(120.0 / h, 300.0 / w, 2.0)
+        img_gray = cv2.resize(img_gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+
+    # 1. CLAHE Contrast enhancement
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    enhanced = clahe.apply(img_gray)
+    enhanced = cv2.bilateralFilter(enhanced, 9, 75, 75)
+
+    return enhanced
 
 @app.post("/detect-plate")
 async def detect_plate(image: UploadFile = File(...)):
     start_time = time.time()
     
-    # Read the uploaded image bytes
+    # Read image
     contents = await image.read()
     nparr = np.frombuffer(contents, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -53,110 +112,103 @@ async def detect_plate(image: UploadFile = File(...)):
     if img is None:
         raise HTTPException(status_code=400, detail="Invalid image file.")
 
-    # Convert to grayscale for processing
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_h, img_w = gray.shape
+
+    # Strategy 1: Center Viewfinder ROI Crop (Target Focus Box)
+    # Most users position the plate within the center 60% of the viewfinder
+    y1_roi = max(0, int(img_h * 0.20))
+    y2_roi = min(img_h, int(img_h * 0.80))
+    x1_roi = max(0, int(img_w * 0.15))
+    x2_roi = min(img_w, int(img_w * 0.85))
+    viewfinder_crop = gray[y1_roi:y2_roi, x1_roi:x2_roi]
+
+    # Strategy 2: Morphological License Plate Localization
+    contour_crops = []
+    try:
+        bfilter = cv2.bilateralFilter(gray, 11, 17, 17)
+        grad_x = cv2.Sobel(bfilter, cv2.CV_16S, 1, 0, ksize=3)
+        abs_grad_x = cv2.convertScaleAbs(grad_x)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 3))
+        morph = cv2.morphologyEx(abs_grad_x, cv2.MORPH_CLOSE, kernel)
+        _, thresh = cv2.threshold(morph, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
+        
+        for c in contours:
+            x, y, w, h = cv2.boundingRect(c)
+            aspect = w / float(h)
+            area = w * h
+            if 1.5 <= aspect <= 6.0 and area > 1200:
+                pad_y = int(h * 0.35)
+                pad_x = int(w * 0.35)
+                cy1 = max(0, y - pad_y)
+                cy2 = min(img_h, y + h + pad_y)
+                cx1 = max(0, x - pad_x)
+                cx2 = min(img_w, x + w + pad_x)
+                contour_crops.append(gray[cy1:cy2, cx1:cx2])
+    except Exception as e:
+        print(f"Contour localization error: {e}")
+
+    # Build candidates to run OCR on (Ordered by priority)
+    ocr_targets = []
     
-    # Apply bilateral filter to remove noise while keeping edges sharp
-    bfilter = cv2.bilateralFilter(gray, 11, 17, 17)
+    # Priority A: Viewfinder Target ROI (Focused)
+    ocr_targets.append(("viewfinder_focus", preprocess_image_for_ocr(viewfinder_crop)))
     
-    # Edge detection
-    edged = cv2.Canny(bfilter, 30, 200)
-    
-    # Find contours
-    contours, _ = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # Sort contours by area, keeping only the largest ones
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-    
-    location = None
-    for contour in contours:
-        # Approximate the polygon
-        approx = cv2.approxPolyDP(contour, 10, True)
-        # If it has 4 points, it might be a license plate
-        if len(approx) == 4:
-            x, y, w, h = cv2.boundingRect(contour)
-            aspect_ratio = w / float(h)
-            # Indonesian plates typically have an aspect ratio between 2.0 and 4.5
-            if 2.0 <= aspect_ratio <= 4.5:
-                location = approx
+    # Priority B: Contour crops
+    for idx, c_crop in enumerate(contour_crops[:2]):
+        ocr_targets.append((f"contour_{idx}", preprocess_image_for_ocr(c_crop)))
+        
+    # Priority C: Full frame
+    ocr_targets.append(("full_frame", preprocess_image_for_ocr(gray)))
+
+    best_result = ("", "", 0.0, "none")
+    all_blocks_logged = []
+    winning_strategy = "none"
+
+    allowlist_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '
+
+    for strategy_name, target_img in ocr_targets:
+        try:
+            ocr_res = reader.readtext(target_img, allowlist=allowlist_chars, paragraph=False)
+            if not ocr_res:
+                continue
+
+            current_blocks = []
+            for (bbox, text, conf) in ocr_res:
+                min_x = min(pt[0] for pt in bbox)
+                current_blocks.append((text, float(conf), min_x))
+                all_blocks_logged.append({
+                    "strategy": strategy_name,
+                    "text": text,
+                    "confidence": round(float(conf), 4)
+                })
+
+            formatted, clean, score, method = score_and_extract_plate(current_blocks)
+            if score > best_result[2]:
+                best_result = (formatted, clean, score, method)
+                winning_strategy = strategy_name
+
+            # If we found a high confidence full plate match from focused viewfinder/contour, we can stop early
+            if score >= 0.85 and "full" in method:
                 break
-                
-    detected_text = ""
-    confidence = 0.0
-    
-    # If a rectangular contour was found, crop and OCR that specific area
-    if location is not None:
-        mask = np.zeros(gray.shape, np.uint8)
-        cv2.drawContours(mask, [location], 0, 255, -1)
-        
-        (x, y) = np.where(mask == 255)
-        (topx, topy) = (np.min(x), np.min(y))
-        (bottomx, bottomy) = (np.max(x), np.max(y))
-        
-        # Add 30% padding to avoid cutting off edge characters
-        h = bottomx - topx
-        w = bottomy - topy
-        padding_y = int(h * 0.3)
-        padding_x = int(w * 0.3)
-        
-        # Ensure padding does not exceed image bounds
-        img_h, img_w = gray.shape
-        topx_padded = max(0, topx - padding_y)
-        bottomx_padded = min(img_h - 1, bottomx + padding_y)
-        topy_padded = max(0, topy - padding_x)
-        bottomy_padded = min(img_w - 1, bottomy + padding_x)
-        
-        cropped = gray[topx_padded:bottomx_padded+1, topy_padded:bottomy_padded+1]
-        
-        # Enhance plate image for clearer OCR reading
-        # 1. Resize to make characters larger (EasyOCR performs better on larger text)
-        cropped = cv2.resize(cropped, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
-        # 2. Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to improve contrast
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        cropped = clahe.apply(cropped)
-        # 3. Apply slight blur to remove upscaling noise
-        cropped = cv2.GaussianBlur(cropped, (3, 3), 0)
-        
-        # Run OCR on the enhanced cropped image
-        result = reader.readtext(cropped)
-    else:
-        # Fallback: Run OCR on the whole image (slower, but works if contour detection failed)
-        result = reader.readtext(gray)
-
-    # Process OCR results: Merge all detected text blocks from left to right
-    # result format: [(bbox, text, conf), ...]
-    # bbox format: [[x1, y1], [x2, y2], [x3, y3], [x4, y4]]
-    
-    # Sort by the minimum X coordinate of the bounding box
-    result.sort(key=lambda item: min(pt[0] for pt in item[0]))
-    
-    all_blocks = []
-    merged_text = ""
-    conf_sum = 0.0
-    valid_blocks = 0
-    
-    for (bbox, text, conf) in result:
-        # Log all raw detected blocks
-        all_blocks.append({
-            "text": text,
-            "confidence": round(float(conf), 4)
-        })
-        
-        cleaned = clean_plate_text(text)
-        if cleaned: # If not empty after cleaning
-            merged_text += cleaned
-            conf_sum += float(conf)
-            valid_blocks += 1
-
-    best_candidate = merged_text
-    best_conf = (conf_sum / valid_blocks) if valid_blocks > 0 else 0.0
+        except Exception as ex:
+            print(f"Error during OCR on {strategy_name}: {ex}")
 
     processing_time_ms = int((time.time() - start_time) * 1000)
 
+    final_plate = best_result[0]
+    final_confidence = min(1.0, round(best_result[2], 4))
+
+    print(f"ANPR Result: '{final_plate}' (Conf: {final_confidence}, Strategy: {winning_strategy}, Time: {processing_time_ms}ms)")
+
     return JSONResponse({
-        "plateNumber": best_candidate,
-        "confidence": round(best_conf, 4),
+        "plateNumber": final_plate,
+        "confidence": final_confidence,
+        "strategy": winning_strategy,
         "processingTimeMs": processing_time_ms,
-        "allDetectedTextBlocks": all_blocks
+        "allDetectedTextBlocks": all_blocks_logged
     })
 
 if __name__ == "__main__":

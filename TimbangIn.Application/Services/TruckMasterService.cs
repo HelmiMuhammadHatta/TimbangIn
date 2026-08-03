@@ -31,9 +31,15 @@ namespace TimbangIn.Application.Services
 
             if (!string.IsNullOrEmpty(filter.SearchTerm))
             {
-                var lowerSearch = filter.SearchTerm.ToLower();
-                query = query.Where(t => t.PlateNumber.ToLower().Contains(lowerSearch) || 
-                                         t.DriverName.ToLower().Contains(lowerSearch));
+                var search = filter.SearchTerm.Trim();
+                var lowerSearch = search.ToLower();
+                var normalizedSearch = search.NormalizePlateNumber();
+
+                query = query.Where(t => 
+                    t.PlateNumber.ToLower().Contains(lowerSearch) || 
+                    (!string.IsNullOrEmpty(normalizedSearch) && (t.PlateNumberNormalized.Contains(normalizedSearch) || t.PlateNumber.Replace(" ", "").ToUpper().Contains(normalizedSearch))) ||
+                    t.DriverName.ToLower().Contains(lowerSearch) ||
+                    (t.Customer != null && t.Customer.Name.ToLower().Contains(lowerSearch)));
             }
 
             var totalCount = await query.CountAsync();
@@ -61,10 +67,35 @@ namespace TimbangIn.Application.Services
             return _mapper.Map<TruckDto>(entity);
         }
 
+        public async Task<TruckDto?> GetByPlateNumberAsync(string plateNumber)
+        {
+            if (string.IsNullOrWhiteSpace(plateNumber)) return null;
+            var normalized = plateNumber.NormalizePlateNumber();
+            if (string.IsNullOrWhiteSpace(normalized)) return null;
+
+            var entity = await _repository.GetQueryable()
+                .Include(t => t.Customer)
+                .FirstOrDefaultAsync(t => 
+                    t.PlateNumberNormalized == normalized || 
+                    t.PlateNumber.Replace(" ", "").ToUpper() == normalized);
+
+            return entity != null ? _mapper.Map<TruckDto>(entity) : null;
+        }
+
         public async Task<TruckDto> CreateTruckAsync(TruckCreateDto dto)
         {
+            var normalizedPlate = dto.PlateNumber.NormalizePlateNumber();
+            if (string.IsNullOrWhiteSpace(normalizedPlate))
+                throw new ArgumentException("Nomor plat tidak valid.");
+
+            var exists = await _repository.ExistsAsync(t => t.PlateNumberNormalized == normalizedPlate);
+            if (exists)
+                throw new ArgumentException("Nomor plat sudah terdaftar di sistem.");
+
             var entity = _mapper.Map<TruckMaster>(dto);
-            entity.PlateNumberNormalized = entity.PlateNumber.NormalizePlateNumber();
+            entity.PlateNumber = dto.PlateNumber.FormatPlateNumber();
+            entity.PlateNumberNormalized = normalizedPlate;
+
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
             return await GetTruckByIdAsync(entity.Id);
@@ -75,8 +106,18 @@ namespace TimbangIn.Application.Services
             var entity = await _repository.GetByIdAsync(id) 
                 ?? throw new KeyNotFoundException("Truck not found.");
 
+            var normalizedPlate = dto.PlateNumber.NormalizePlateNumber();
+            if (string.IsNullOrWhiteSpace(normalizedPlate))
+                throw new ArgumentException("Nomor plat tidak valid.");
+
+            var duplicate = await _repository.ExistsAsync(t => t.PlateNumberNormalized == normalizedPlate && t.Id != id);
+            if (duplicate)
+                throw new ArgumentException("Nomor plat sudah digunakan oleh truk lain.");
+
             _mapper.Map(dto, entity);
-            entity.PlateNumberNormalized = entity.PlateNumber.NormalizePlateNumber();
+            entity.PlateNumber = dto.PlateNumber.FormatPlateNumber();
+            entity.PlateNumberNormalized = normalizedPlate;
+
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
             return await GetTruckByIdAsync(entity.Id);
