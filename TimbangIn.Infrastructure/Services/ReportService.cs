@@ -34,10 +34,14 @@ namespace TimbangIn.Infrastructure.Services
                 .AsQueryable();
 
             // Apply Filters
-            // Include EndDate boundary properly (assuming user selected a date range)
-            var endOfDay = filter.EndDate.Date.AddDays(1).AddTicks(-1);
+            // Ensure DateTime is UTC for PostgreSQL timestamp with time zone
+            var startDateLocal = DateTime.SpecifyKind(filter.StartDate.Date, DateTimeKind.Local);
+            var endDateLocal = DateTime.SpecifyKind(filter.EndDate.Date, DateTimeKind.Local);
             
-            query = query.Where(t => t.CreatedAt >= filter.StartDate.Date && t.CreatedAt <= endOfDay);
+            var startDateUtc = startDateLocal.ToUniversalTime();
+            var endOfDayUtc = endDateLocal.AddDays(1).AddTicks(-1).ToUniversalTime();
+            
+            query = query.Where(t => t.CreatedAt >= startDateUtc && t.CreatedAt <= endOfDayUtc);
 
             if (filter.CustomerId.HasValue)
                 query = query.Where(t => t.CustomerId == filter.CustomerId.Value);
