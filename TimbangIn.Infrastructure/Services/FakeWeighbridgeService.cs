@@ -75,8 +75,8 @@ namespace TimbangIn.Infrastructure.Services
                 {
                     // Approaching target weight (truck driving onto the scale)
                     _isStable = false;
-                    decimal step = _targetWeight * 0.15m; // move 15% closer
-                    _currentWeight += step + _random.Next(-100, 100);
+                    decimal step = (_targetWeight - _currentWeight) * 0.15m; // move 15% closer
+                    _currentWeight += step + _random.Next(-10, 10);
                 }
                 else
                 {

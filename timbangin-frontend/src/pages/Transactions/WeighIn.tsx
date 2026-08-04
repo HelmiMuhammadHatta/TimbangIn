@@ -325,21 +325,26 @@ const WeighbridgeDisplay: React.FC<{ onWeightChange: (weight: number, isStable: 
             .withAutomaticReconnect()
             .build();
 
-        connection.on("ReceiveWeight", (data: any) => {
-            setWeight(data.weight);
+        connection.on("WeightUpdate", (data: any) => {
+            setWeight(data.weightKg);
             setIsStable(data.isStable);
-            onWeightChange(data.weight, data.isStable);
+            onWeightChange(data.weightKg, data.isStable);
         });
 
         const start = async () => {
             try {
                 await connection.start();
                 setStatus('Connected');
+                await connection.invoke("SubscribeToWeight");
             } catch (err) {
                 console.error("SignalR Connection Error: ", err);
                 setStatus('Error');
             }
         };
+
+        connection.onreconnected(() => {
+            connection.invoke("SubscribeToWeight").catch(console.error);
+        });
 
         start();
 
