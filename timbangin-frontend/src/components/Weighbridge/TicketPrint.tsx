@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface TicketPrintProps {
     transaction: any;
 }
 
 export const TicketPrint: React.FC<TicketPrintProps> = ({ transaction }) => {
+    useEffect(() => {
+        if (transaction) {
+            const originalTitle = document.title;
+            const dateStr = new Date(transaction.weighInTimestamp).toISOString().split('T')[0];
+            const type = transaction.weighOutKg == null ? "Masuk" : "Keluar";
+            const plate = transaction.truckPlateNumber.replace(/\s+/g, '');
+            document.title = `Tiket_${type}_${plate}_${dateStr}`;
+            
+            return () => {
+                document.title = originalTitle;
+            };
+        }
+    }, [transaction]);
+
     if (!transaction) return null;
 
     return (

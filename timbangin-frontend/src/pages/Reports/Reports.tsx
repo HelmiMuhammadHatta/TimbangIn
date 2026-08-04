@@ -11,7 +11,12 @@ interface ReportFilter {
 }
 
 export const Reports = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const getLocalToday = () => {
+        const date = new Date();
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - userTimezoneOffset).toISOString().split('T')[0];
+    };
+    const today = getLocalToday();
     const [filter, setFilter] = useState<ReportFilter>({
         startDate: today,
         endDate: today
