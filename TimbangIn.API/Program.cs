@@ -41,8 +41,22 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardNotifier, TimbangIn.API.Services.DashboardNotifier>();
 builder.Services.AddScoped<IReportService, TimbangIn.Infrastructure.Services.ReportService>();
 
-// Register FakeWeighbridgeService as Singleton to maintain state across requests/connections
-builder.Services.AddSingleton<IWeighbridgeService, TimbangIn.Infrastructure.Services.FakeWeighbridgeService>();
+// Weighbridge Configuration & Service
+builder.Services.Configure<TimbangIn.Infrastructure.Configuration.WeighbridgeOptions>(
+    builder.Configuration.GetSection("Weighbridge"));
+
+var useRealHardware = builder.Configuration.GetValue<bool>("Weighbridge:UseRealHardware");
+
+if (useRealHardware)
+{
+    // Register RealWeighbridgeService as Singleton
+    builder.Services.AddSingleton<IWeighbridgeService, TimbangIn.Infrastructure.Services.RealWeighbridgeService>();
+}
+else
+{
+    // Register FakeWeighbridgeService as Singleton to maintain state across requests/connections
+    builder.Services.AddSingleton<IWeighbridgeService, TimbangIn.Infrastructure.Services.FakeWeighbridgeService>();
+}
 
 // ANPR Integration
 builder.Services.AddHttpClient();

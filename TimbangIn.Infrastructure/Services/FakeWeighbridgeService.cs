@@ -36,6 +36,16 @@ namespace TimbangIn.Infrastructure.Services
             return Task.CompletedTask;
         }
 
+        public Task<WeighbridgeConnectionStatus> GetConnectionStatusAsync()
+        {
+            return Task.FromResult(new WeighbridgeConnectionStatus
+            {
+                IsConnected = true,
+                ComPort = "SIMULATED",
+                LastDataReceivedAt = DateTime.UtcNow
+            });
+        }
+
         public async IAsyncEnumerable<WeighbridgeReading> StreamWeightAsync([EnumeratorCancellation] CancellationToken ct)
         {
             while (!ct.IsCancellationRequested)

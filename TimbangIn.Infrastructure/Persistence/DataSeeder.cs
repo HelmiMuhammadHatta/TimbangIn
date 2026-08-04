@@ -85,14 +85,27 @@ namespace TimbangIn.Infrastructure.Persistence
                     rolePermissions.Add(new RolePermission { Role = Role.Admin, PermissionId = perm.Id });
                 }
 
-                // Operator gets limited permissions
-                var operatorPerms = new[] { "customer.read", "truck.read", "material.read", "transaction.read", "transaction.create" };
+                // Operator gets operational permissions
+                var operatorPerms = new[] { "customer.read", "truck.read", "truck.create", "material.read", "transaction.read", "transaction.create" };
                 foreach (var perm in permissions.Where(p => operatorPerms.Contains(p.Name)))
                 {
                     rolePermissions.Add(new RolePermission { Role = Role.Operator, PermissionId = perm.Id });
                 }
 
                 context.RolePermissions.AddRange(rolePermissions);
+            }
+            else
+            {
+                // Ensure Operator has truck.create and customer.read if permissions were already seeded
+                var truckCreatePerm = await context.Permissions.FirstOrDefaultAsync(p => p.Name == "truck.create");
+                if (truckCreatePerm != null)
+                {
+                    var hasTruckCreate = await context.RolePermissions.AnyAsync(rp => rp.Role == Role.Operator && rp.PermissionId == truckCreatePerm.Id);
+                    if (!hasTruckCreate)
+                    {
+                        context.RolePermissions.Add(new RolePermission { Role = Role.Operator, PermissionId = truckCreatePerm.Id });
+                    }
+                }
             }
 
             await context.SaveChangesAsync();

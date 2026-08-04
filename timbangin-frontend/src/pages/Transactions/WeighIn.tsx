@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AnprCapture } from '../../components/Weighbridge/AnprCapture';
 import axiosInstance from '../../api/axiosInstance';
 import { TicketPrint } from '../../components/Weighbridge/TicketPrint';
 
 export const WeighIn: React.FC = () => {
+    const location = useLocation();
     const [customers, setCustomers] = useState<any[]>([]);
     const [materials, setMaterials] = useState<any[]>([]);
     const [trucks, setTrucks] = useState<any[]>([]);
@@ -24,6 +26,16 @@ export const WeighIn: React.FC = () => {
         fetchMasterData();
     }, []);
 
+    // Handle pre-filling from GateMonitor navigation
+    useEffect(() => {
+        if (location.state?.truckId) {
+            setSelectedTruckId(location.state.truckId);
+        }
+        if (location.state?.customerId) {
+            setSelectedCustomerId(location.state.customerId);
+        }
+    }, [location.state]);
+
     const fetchMasterData = async () => {
         try {
             const [custRes, matRes, truckRes] = await Promise.all([
@@ -31,9 +43,35 @@ export const WeighIn: React.FC = () => {
                 axiosInstance.get('/materialtypes?pageSize=100'),
                 axiosInstance.get('/trucks?pageSize=100')
             ]);
-            setCustomers(custRes.data.data.items);
-            setMaterials(matRes.data.data.items);
-            setTrucks(truckRes.data.data.items);
+            const loadedCustomers = custRes.data.data.items || [];
+            const loadedMaterials = matRes.data.data.items || [];
+            const loadedTrucks = truckRes.data.data.items || [];
+
+            setCustomers(loadedCustomers);
+            setMaterials(loadedMaterials);
+            setTrucks(loadedTrucks);
+
+            // If arrived with state truckId but not in truck list yet, fetch it
+            if (location.state?.truckId) {
+                const found = loadedTrucks.find((t: any) => t.id === location.state.truckId);
+                if (found) {
+                    setSelectedTruckId(found.id);
+                    if (found.customerId) setSelectedCustomerId(found.customerId);
+                } else if (location.state?.plateNumber) {
+                    try {
+                        const cleanTarget = location.state.plateNumber.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                        const singleRes = await axiosInstance.get(`/trucks/by-plate/${cleanTarget}`);
+                        if (singleRes.data.success && singleRes.data.data) {
+                            const newT = singleRes.data.data;
+                            setTrucks((prev: any[]) => [...prev, newT]);
+                            setSelectedTruckId(newT.id);
+                            if (newT.customerId) setSelectedCustomerId(newT.customerId);
+                        }
+                    } catch {
+                        // ignore
+                    }
+                }
+            }
         } catch (err) {
             console.error('Failed to load master data', err);
         }
@@ -168,7 +206,7 @@ export const WeighIn: React.FC = () => {
                 <div className="space-y-6">
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                         <h2 className="text-lg font-medium mb-4">1. Identifikasi Truk (ANPR)</h2>
-                        <AnprCapture onDetectResult={handleAnprResult} />
+                        <AnprCapture onDetectResult={handleAnprResult} showProceedButton={false} />
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">

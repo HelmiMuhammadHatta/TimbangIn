@@ -30,5 +30,12 @@ namespace TimbangIn.API.Controllers
             await _weighbridgeService.ResetAsync();
             return Ok(new { success = true, message = "Weighbridge reset successfully" });
         }
+
+        [HttpGet("connection-status")]
+        public async Task<IActionResult> GetConnectionStatus()
+        {
+            var status = await _weighbridgeService.GetConnectionStatusAsync();
+            return Ok(status);
+        }
     }
 }

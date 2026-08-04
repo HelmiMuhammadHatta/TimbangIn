@@ -12,13 +12,7 @@ namespace TimbangIn.Application.Validators
         {
             RuleFor(x => x.PlateNumber)
                 .NotEmpty().WithMessage("Nomor plat wajib diisi.")
-                .Matches(@"^[a-zA-Z]{1,2}\s*[0-9]{1,4}(\s*[a-zA-Z]{1,3})?$").WithMessage("Format plat tidak valid (contoh: R 3905 DW atau R3905DW).")
-                .MustAsync(async (plate, cancellation) => 
-                {
-                    string normalized = plate.NormalizePlateNumber();
-                    bool exists = await repository.ExistsAsync(t => t.PlateNumberNormalized == normalized);
-                    return !exists;
-                }).WithMessage("Nomor plat sudah terdaftar.");
+                .Matches(@"^[a-zA-Z]{1,2}\s*[0-9]{1,4}(\s*[a-zA-Z]{1,3})?$").WithMessage("Format plat tidak valid (contoh: R 3905 DW atau R3905DW).");
 
             RuleFor(x => x.CustomerId).NotEmpty().WithMessage("Customer wajib dipilih.");
             RuleFor(x => x.MaxCapacityKg).GreaterThan(0).WithMessage("Kapasitas maksimal harus lebih dari 0.");

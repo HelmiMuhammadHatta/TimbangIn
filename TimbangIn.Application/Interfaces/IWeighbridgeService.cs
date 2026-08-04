@@ -10,5 +10,6 @@ namespace TimbangIn.Application.Interfaces
         Task<WeighbridgeReading> GetCurrentWeightAsync();
         IAsyncEnumerable<WeighbridgeReading> StreamWeightAsync(CancellationToken ct);
         Task ResetAsync();
+        Task<WeighbridgeConnectionStatus> GetConnectionStatusAsync();
     }
 }

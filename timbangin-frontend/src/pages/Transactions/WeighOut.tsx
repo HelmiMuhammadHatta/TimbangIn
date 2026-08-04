@@ -149,7 +149,7 @@ export const WeighOut: React.FC = () => {
                 <div className="space-y-6">
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                         <h2 className="text-lg font-medium mb-4">1. Identifikasi Otomatis (ANPR)</h2>
-                        <AnprCapture onDetectResult={handleAnprResult} />
+                        <AnprCapture onDetectResult={handleAnprResult} showProceedButton={false} />
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
