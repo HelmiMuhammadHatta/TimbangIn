@@ -5,8 +5,8 @@ const GateMonitor = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Monitor Gate Masuk</h1>
-          <p className="text-slate-400">Deteksi plat nomor truk otomatis menggunakan kamera gate (ANPR)</p>
+          <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100">Monitor Gate Masuk</h1>
+          <p className="text-sm font-display text-gray-500 dark:text-gray-400 mt-1">Deteksi plat nomor truk otomatis menggunakan kamera gate (ANPR)</p>
         </div>
       </div>
 

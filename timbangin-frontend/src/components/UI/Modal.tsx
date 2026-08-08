@@ -32,16 +32,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       
       {/* Modal Panel */}
       <div className={`relative w-full max-w-lg p-4 md:p-6 mx-4 transition-all duration-300 transform ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
-        <div className="relative bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
+        <div className="relative bg-white dark:bg-steel-800 rounded-lg shadow-2xl border border-gray-200 dark:border-steel-900 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white/50">
-            <h3 className="text-xl font-bold text-gray-800 tracking-tight">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-steel-900 bg-gray-50 dark:bg-steel-900">
+            <h3 className="text-xl font-display font-bold text-gray-800 dark:text-steel-100 tracking-wide uppercase">
               {title}
             </h3>
             <button
               onClick={onClose}
               type="button"
-              className="text-gray-400 bg-transparent hover:bg-gray-100 hover:text-gray-900 rounded-xl text-sm w-9 h-9 ms-auto inline-flex justify-center items-center transition-colors"
+              className="text-gray-400 bg-transparent hover:bg-gray-200 dark:hover:bg-steel-800 hover:text-gray-900 dark:hover:text-steel-100 rounded-lg text-sm w-9 h-9 ms-auto inline-flex justify-center items-center transition-colors"
             >
               <X size={20} strokeWidth={2.5} />
               <span className="sr-only">Close modal</span>

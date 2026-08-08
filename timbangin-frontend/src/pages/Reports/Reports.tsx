@@ -112,17 +112,17 @@ export const Reports = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Laporan Transaksi</h1>
-                    <p className="text-sm text-gray-500">Filter, preview, dan export rekapitulasi data timbang</p>
+                    <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100 uppercase tracking-wide">Laporan Transaksi</h1>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-display">Filter, preview, dan export rekapitulasi data timbang</p>
                 </div>
-                <div className="flex space-x-3">
-                    <button onClick={handleExportExcel} className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <div className="flex space-x-3 w-full md:w-auto">
+                    <button onClick={handleExportExcel} className="flex-1 md:flex-none flex justify-center items-center space-x-2 bg-signal-green hover:bg-green-500 text-steel-900 font-display font-bold shadow-sm uppercase tracking-wide text-sm px-4 py-2 rounded-lg transition-colors">
                         <FileSpreadsheet size={18} />
                         <span>Export Excel</span>
                     </button>
-                    <button onClick={handleExportPdf} className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button onClick={handleExportPdf} className="flex-1 md:flex-none flex justify-center items-center space-x-2 bg-white dark:bg-steel-800 hover:bg-gray-50 dark:hover:bg-steel-700 border border-gray-300 dark:border-steel-600 text-gray-900 dark:text-white font-display font-bold shadow-sm uppercase tracking-wide text-sm px-4 py-2 rounded-lg transition-colors">
                         <Download size={18} />
                         <span>Export PDF</span>
                     </button>
@@ -130,30 +130,30 @@ export const Reports = () => {
             </div>
 
             {/* Filter Card */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mulai Tanggal</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-steel-100 mb-1">Mulai Tanggal</label>
                         <input 
                             type="date" 
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber px-3 py-2"
                             value={filter.startDate}
                             onChange={e => setFilter({...filter, startDate: e.target.value})}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Sampai Tanggal</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-steel-100 mb-1">Sampai Tanggal</label>
                         <input 
                             type="date" 
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber px-3 py-2"
                             value={filter.endDate}
                             onChange={e => setFilter({...filter, endDate: e.target.value})}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-steel-100 mb-1">Customer</label>
                         <select 
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber px-3 py-2"
                             value={filter.customerId || ''}
                             onChange={e => setFilter({...filter, customerId: e.target.value})}
                         >
@@ -162,9 +162,9 @@ export const Reports = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-steel-100 mb-1">Material</label>
                         <select 
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber px-3 py-2"
                             value={filter.materialTypeId || ''}
                             onChange={e => setFilter({...filter, materialTypeId: e.target.value})}
                         >
@@ -173,9 +173,9 @@ export const Reports = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <label className="block text-sm font-medium text-gray-900 dark:text-steel-100 mb-1">Status</label>
                         <select 
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber px-3 py-2"
                             value={filter.status || ''}
                             onChange={e => setFilter({...filter, status: e.target.value})}
                         >
@@ -190,7 +190,7 @@ export const Reports = () => {
                     <button 
                         onClick={handleSearch}
                         disabled={loading}
-                        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition-colors disabled:bg-blue-300"
+                        className="flex items-center justify-center space-x-2 bg-steel-800 hover:bg-steel-700 dark:bg-steel-700 dark:hover:bg-steel-600 text-white font-display font-bold uppercase tracking-wide px-6 py-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-50"
                     >
                         <Search size={18} />
                         <span>{loading ? 'Memuat...' : 'Cari Data'}</span>
@@ -201,75 +201,75 @@ export const Reports = () => {
             {/* Summary */}
             {summary && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="text-gray-500 text-sm font-medium mb-1">Total Transaksi</h3>
-                        <p className="text-3xl font-bold text-gray-800">{summary.totalTransactions}</p>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h3 className="text-gray-500 dark:text-gray-400 text-sm font-display font-semibold uppercase tracking-wide mb-1">Total Transaksi</h3>
+                        <p className="text-3xl font-mono font-bold text-gray-900 dark:text-steel-100">{summary.totalTransactions}</p>
                     </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="text-gray-500 text-sm font-medium mb-1">Total Netto Filtered</h3>
-                        <p className="text-3xl font-bold text-gray-800">
-                            {summary.totalNettoKg.toLocaleString('id-ID')} <span className="text-sm font-normal text-gray-500">Kg</span>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h3 className="text-gray-500 dark:text-gray-400 text-sm font-display font-semibold uppercase tracking-wide mb-1">Total Netto Filtered</h3>
+                        <p className="text-3xl font-mono font-bold text-gray-900 dark:text-steel-100">
+                            {summary.totalNettoKg.toLocaleString('id-ID')} <span className="text-sm font-sans font-normal text-gray-500 dark:text-gray-400">Kg</span>
                         </p>
                     </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 className="text-gray-500 text-sm font-medium mb-1">Rata-rata Netto</h3>
-                        <p className="text-3xl font-bold text-gray-800">
-                            {summary.averageNettoKg.toLocaleString('id-ID', {maximumFractionDigits:2})} <span className="text-sm font-normal text-gray-500">Kg</span>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h3 className="text-gray-500 dark:text-gray-400 text-sm font-display font-semibold uppercase tracking-wide mb-1">Rata-rata Netto</h3>
+                        <p className="text-3xl font-mono font-bold text-gray-900 dark:text-steel-100">
+                            {summary.averageNettoKg.toLocaleString('id-ID', {maximumFractionDigits:2})} <span className="text-sm font-sans font-normal text-gray-500 dark:text-gray-400">Kg</span>
                         </p>
                     </div>
                 </div>
             )}
 
             {/* Preview Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-800 flex items-center">
-                        <FileText size={18} className="text-blue-500 mr-2" />
+            <div className="bg-white dark:bg-steel-800 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-steel-700 flex items-center justify-between">
+                    <h3 className="font-display font-bold text-gray-900 dark:text-steel-100 flex items-center uppercase tracking-wide">
+                        <FileText size={18} className="text-safety-amber mr-2" />
                         Preview Laporan
                     </h3>
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-steel-700">
+                        <thead className="bg-gray-50 dark:bg-steel-900 border-b border-gray-200 dark:border-steel-700">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ticket</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plat</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bruto (Kg)</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Tara (Kg)</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Netto (Kg)</th>
-                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">No</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ticket</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tanggal</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Plat</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                <th className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Material</th>
+                                <th className="px-6 py-3 text-right text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bruto (Kg)</th>
+                                <th className="px-6 py-3 text-right text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tara (Kg)</th>
+                                <th className="px-6 py-3 text-right text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Netto (Kg)</th>
+                                <th className="px-6 py-3 text-center text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-steel-800 divide-y divide-gray-200 dark:divide-steel-700">
                             {transactions.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="px-6 py-8 text-center text-sm text-gray-500">
+                                    <td colSpan={10} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400 font-display">
                                         Tidak ada data yang sesuai dengan filter.
                                     </td>
                                 </tr>
                             ) : (
                                 transactions.map((t, i) => (
-                                    <tr key={t.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{i + 1}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{t.ticketNumber}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-steel-700/50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">{i + 1}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-gray-900 dark:text-steel-100">{t.ticketNumber}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">
                                             {new Date(t.weighInTimestamp).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{t.truckPlateNumber}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.customerName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.materialTypeName}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{t.weighInKg.toLocaleString('id-ID')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{(t.weighOutKg || 0).toLocaleString('id-ID')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-right">{(t.nettoKg || 0).toLocaleString('id-ID')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                                t.status === 'Selesai' ? 'bg-green-100 text-green-800' :
-                                                t.status === 'Dibatalkan' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-steel-100 font-mono font-bold">{t.truckPlateNumber}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{t.customerName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{t.materialTypeName}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono text-right">{t.weighInKg.toLocaleString('id-ID')}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-mono text-right">{(t.weighOutKg || 0).toLocaleString('id-ID')}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-blue-600 dark:text-blue-400 text-right">{(t.nettoKg || 0).toLocaleString('id-ID')}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center font-display">
+                                            <span className={`px-2 py-1 text-xs font-bold uppercase tracking-wider rounded-full ${
+                                                t.status === 'Selesai' ? 'bg-signal-green/20 text-green-700 dark:text-signal-green border border-signal-green/30' :
+                                                t.status === 'Dibatalkan' ? 'bg-alert-red/20 text-red-700 dark:text-alert-red border border-alert-red/30' :
+                                                'bg-safety-amber/20 text-yellow-700 dark:text-safety-amber border border-safety-amber/30'
                                             }`}>
                                                 {t.status === 'MenungguTimbangKeluar' ? 'Menunggu' : t.status}
                                             </span>

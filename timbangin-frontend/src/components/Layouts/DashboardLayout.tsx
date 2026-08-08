@@ -1,13 +1,17 @@
-import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LogOut, Home, Truck, Users, FileText, Box, Scale, Camera, ArrowRightCircle, ArrowLeftCircle, History } from 'lucide-react';
+import { LogOut, Home, Truck, Users, FileText, Box, Scale, Camera, ArrowRightCircle, ArrowLeftCircle, History, Sun, Moon, Menu, X } from 'lucide-react';
 import axiosInstance from '../../api/axiosInstance';
 import PermissionGate from '../Guard/PermissionGate';
+import { useTheme } from '../../store/ThemeContext';
 
 export const DashboardLayout = () => {
   const { username, clearAuth } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -20,93 +24,104 @@ export const DashboardLayout = () => {
     }
   };
 
+  const navItems = [
+    { path: '/', icon: Home, label: 'Dashboard' },
+    { path: '/trucks', icon: Truck, label: 'Master Truck', permission: 'truck.read' },
+    { path: '/customers', icon: Users, label: 'Master Customer', permission: 'customer.read' },
+    { path: '/material-types', icon: Box, label: 'Master Material', permission: 'material.read' },
+    { path: '/weighbridge-monitor', icon: Scale, label: 'Weighbridge Monitor', permission: 'transaction.read' },
+    { path: '/gate-monitor', icon: Camera, label: 'Gate Monitor (ANPR)', permission: 'transaction.read' },
+    { path: '/weigh-in', icon: ArrowRightCircle, label: 'Timbang Masuk', permission: 'transaction.create' },
+    { path: '/weigh-out', icon: ArrowLeftCircle, label: 'Timbang Keluar', permission: 'transaction.create' },
+    { path: '/transactions', icon: History, label: 'Riwayat Transaksi', permission: 'transaction.read' },
+    { path: '/reports', icon: FileText, label: 'Laporan', permission: 'transaction.read' },
+  ];
+
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-steel-900 transition-colors">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col shadow-sm">
-        <div className="h-16 flex items-center justify-center border-b font-bold text-xl text-blue-600">
-          TimbangIn
+      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-steel-800 border-r border-gray-200 dark:border-steel-900 flex flex-col shadow-sm transition-transform duration-300 md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-steel-900">
+          <div className="font-display font-bold text-xl text-safety-amber tracking-wider uppercase">
+            TimbangIn
+          </div>
+          <button className="md:hidden text-gray-500 dark:text-steel-100" onClick={() => setIsSidebarOpen(false)}>
+            <X size={24} />
+          </button>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          <Link to="/" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-            <Home size={20} />
-            <span>Dashboard</span>
-          </Link>
-          <PermissionGate permission="truck.read">
-            <Link to="/trucks" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Truck size={20} />
-              <span>Master Truck</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="customer.read">
-            <Link to="/customers" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Users size={20} />
-              <span>Master Customer</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="material.read">
-            <Link to="/material-types" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Box size={20} />
-              <span>Master Material</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.read">
-            <Link to="/weighbridge-monitor" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Scale size={20} />
-              <span>Weighbridge Monitor</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.read">
-            <Link to="/gate-monitor" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <Camera size={20} />
-              <span>Gate Monitor (ANPR)</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.create">
-            <Link to="/weigh-in" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <ArrowRightCircle size={20} />
-              <span>Timbang Masuk</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.create">
-            <Link to="/weigh-out" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <ArrowLeftCircle size={20} />
-              <span>Timbang Keluar</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.read">
-            <Link to="/transactions" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <History size={20} />
-              <span>Riwayat Transaksi</span>
-            </Link>
-          </PermissionGate>
-          <PermissionGate permission="transaction.read">
-            <Link to="/reports" className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md text-gray-700">
-              <FileText size={20} />
-              <span>Laporan</span>
-            </Link>
-          </PermissionGate>
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+            const LinkComponent = (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setIsSidebarOpen(false)}
+                className={`flex items-center space-x-3 p-2.5 rounded-md transition-colors ${
+                  isActive 
+                    ? 'border-l-4 border-safety-amber bg-gray-100 dark:bg-steel-900 text-safety-amber dark:text-safety-amber font-medium' 
+                    : 'border-l-4 border-transparent text-gray-600 dark:text-steel-100 hover:bg-gray-50 dark:hover:bg-steel-900 hover:text-safety-amber'
+                }`}
+              >
+                <item.icon size={20} className={isActive ? 'text-safety-amber' : 'opacity-70'} />
+                <span>{item.label}</span>
+              </Link>
+            );
+
+            return item.permission ? (
+              <PermissionGate key={item.path} permission={item.permission}>
+                {LinkComponent}
+              </PermissionGate>
+            ) : (
+              LinkComponent
+            );
+          })}
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-w-0">
         {/* Navbar */}
-        <header className="h-16 bg-white border-b flex items-center justify-between px-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-800">Weighbridge Management System</h2>
+        <header className="h-16 bg-white dark:bg-steel-800 border-b border-gray-200 dark:border-steel-900 flex items-center justify-between px-4 shadow-sm">
+          <div className="flex items-center">
+            <button className="md:hidden mr-4 text-gray-500 dark:text-steel-100" onClick={() => setIsSidebarOpen(true)}>
+              <Menu size={24} />
+            </button>
+            <h2 className="text-xl font-display font-semibold text-gray-800 dark:text-steel-100 hidden sm:block">Weighbridge Management System</h2>
+          </div>
+          
           <div className="flex items-center space-x-4">
-            <span className="text-gray-600">Halo, <strong className="text-gray-900">{username}</strong></span>
+            <button 
+              onClick={toggleTheme} 
+              className="p-2 text-gray-500 dark:text-steel-100 hover:bg-gray-100 dark:hover:bg-steel-900 rounded-full transition-colors"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            
+            <span className="text-gray-600 dark:text-steel-100 hidden sm:inline-block">
+              Halo, <strong className="text-gray-900 dark:text-white font-mono">{username}</strong>
+            </span>
+            
             <button 
               onClick={handleLogout}
-              className="flex items-center space-x-1 text-red-600 hover:text-red-700 px-3 py-2 rounded-md hover:bg-red-50 transition-colors"
+              className="flex items-center space-x-1 text-alert-red hover:text-alert-red px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-alert-red/10 transition-colors border border-transparent hover:border-alert-red/30"
             >
               <LogOut size={18} />
-              <span>Logout</span>
+              <span className="hidden sm:inline-block font-display tracking-wide text-sm">LOGOUT</span>
             </button>
           </div>
         </header>
         
-        <div className="p-6 overflow-auto h-[calc(100vh-4rem)]">
+        <div className="p-4 sm:p-6 overflow-auto h-[calc(100vh-4rem)]">
           <Outlet />
         </div>
       </main>

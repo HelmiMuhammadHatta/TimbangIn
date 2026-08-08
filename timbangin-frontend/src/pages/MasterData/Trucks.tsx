@@ -6,6 +6,7 @@ import ConfirmDialog from '../../components/UI/ConfirmDialog';
 import PermissionGate from '../../components/Guard/PermissionGate';
 import Modal from '../../components/UI/Modal';
 import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { StatusBadge } from '../../components/UI/StatusBadge';
 
 interface Truck {
   id: string;
@@ -137,30 +138,38 @@ export const Trucks = () => {
   };
 
   const columns = [
-    { header: 'No. Polisi', accessor: 'plateNumber' as keyof Truck },
+    { 
+      header: 'No. Polisi', 
+      accessor: (row: Truck) => <span className="font-mono text-base">{row.plateNumber}</span> 
+    },
     { header: 'Sopir', accessor: 'driverName' as keyof Truck },
     { header: 'Perusahaan / Customer', accessor: 'customerName' as keyof Truck },
-    { header: 'Kapasitas Maksimal (kg)', accessor: 'maxCapacityKg' as keyof Truck },
+    { 
+      header: 'Kapasitas Maksimal (kg)', 
+      className: 'text-right',
+      accessor: (row: Truck) => <span className="font-mono block text-right">{row.maxCapacityKg.toLocaleString('id-ID')}</span> 
+    },
     {
       header: 'Status',
       accessor: (row: Truck) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {row.isActive ? 'Aktif' : 'Nonaktif'}
-        </span>
+        <StatusBadge 
+          status={row.isActive ? 'ready' : 'error'} 
+          label={row.isActive ? 'Aktif' : 'Nonaktif'} 
+        />
       ),
     },
     {
       header: 'Aksi',
       accessor: (row: Truck) => (
-        <div className="flex space-x-2">
+        <div className="flex space-x-3">
           <PermissionGate permission="truck.update">
-            <button className="text-blue-600 hover:text-blue-900" title="Edit" onClick={() => handleOpenEdit(row)}>
+            <button className="text-gray-500 hover:text-safety-amber dark:text-gray-400 dark:hover:text-safety-amber transition-colors" title="Edit" onClick={() => handleOpenEdit(row)}>
               <Edit2 size={18} />
             </button>
           </PermissionGate>
           <PermissionGate permission="truck.delete">
             <button 
-              className="text-red-600 hover:text-red-900" 
+              className="text-gray-500 hover:text-alert-red dark:text-gray-400 dark:hover:text-alert-red transition-colors" 
               title="Delete"
               onClick={() => setDeleteDialog({ isOpen: true, id: row.id, title: row.plateNumber })}
             >
@@ -175,21 +184,21 @@ export const Trucks = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Master Truck</h1>
+        <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100">Master Truck</h1>
         <PermissionGate permission="truck.create">
-          <button onClick={handleOpenAdd} className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+          <button onClick={handleOpenAdd} className="flex items-center space-x-2 bg-safety-amber text-steel-900 px-4 py-2 rounded-md hover:bg-yellow-500 transition-colors font-display tracking-wide uppercase text-sm font-semibold">
             <Plus size={20} />
             <span>Tambah Truck</span>
           </button>
         </PermissionGate>
       </div>
 
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center bg-white dark:bg-steel-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-steel-900">
         <div className="relative w-72">
           <input
             type="text"
             placeholder="Cari truck..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-steel-900 bg-gray-50 dark:bg-steel-900 text-gray-900 dark:text-steel-100 rounded-md focus:ring-safety-amber focus:border-safety-amber transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => {
@@ -220,32 +229,32 @@ export const Trucks = () => {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-900">Plat Nomor (No. Polisi)</label>
+            <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-steel-100">Plat Nomor (No. Polisi)</label>
             <input 
               type="text" 
               required
               placeholder="Contoh: R 3905 DW atau R3905DW"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm font-mono uppercase rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+              className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-800 text-gray-900 dark:text-steel-100 text-sm font-mono uppercase rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5" 
               value={formData.plateNumber}
               onChange={(e) => setFormData({...formData, plateNumber: e.target.value.toUpperCase()})}
             />
-            <p className="mt-1 text-xs text-gray-500">Bisa diinput dengan atau tanpa spasi (misal: R 3905 DW atau R3905DW)</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Bisa diinput dengan atau tanpa spasi (misal: R 3905 DW atau R3905DW)</p>
           </div>
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-900">Nama Sopir</label>
+            <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-steel-100">Nama Sopir</label>
             <input 
               type="text" 
               required
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+              className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-800 text-gray-900 dark:text-steel-100 text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5" 
               value={formData.driverName}
               onChange={(e) => setFormData({...formData, driverName: e.target.value})}
             />
           </div>
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-900">Customer (Pemilik)</label>
+            <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-steel-100">Customer (Pemilik)</label>
             <select 
               required
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-800 text-gray-900 dark:text-steel-100 text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5"
               value={formData.customerId}
               onChange={(e) => setFormData({...formData, customerId: e.target.value})}
             >
@@ -256,12 +265,12 @@ export const Trucks = () => {
             </select>
           </div>
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-900">Kapasitas Maksimal (kg)</label>
+            <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-steel-100">Kapasitas Maksimal (kg)</label>
             <input 
               type="number" 
               required
               min="0"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+              className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-800 text-gray-900 dark:text-steel-100 font-mono text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5" 
               value={formData.maxCapacityKg}
               onChange={(e) => setFormData({...formData, maxCapacityKg: Number(e.target.value)})}
             />
@@ -271,17 +280,17 @@ export const Trucks = () => {
               <input 
                 id="isActiveTruck" 
                 type="checkbox" 
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-safety-amber bg-gray-100 dark:bg-steel-900 border-gray-300 dark:border-steel-800 rounded focus:ring-safety-amber"
                 checked={formData.isActive}
                 onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
               />
-              <label htmlFor="isActiveTruck" className="ms-2 text-sm font-medium text-gray-900">Aktif</label>
+              <label htmlFor="isActiveTruck" className="ms-2 text-sm font-medium text-gray-900 dark:text-steel-100">Aktif</label>
             </div>
           )}
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-4 space-x-2">
             <button 
               type="button" 
-              className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700"
+              className="font-display tracking-wide uppercase text-sm font-semibold py-2.5 px-5 text-gray-900 dark:text-steel-100 bg-white dark:bg-steel-800 rounded-lg border border-gray-200 dark:border-steel-900 hover:bg-gray-100 dark:hover:bg-steel-900"
               onClick={() => setModalState({ ...modalState, isOpen: false })}
             >
               Batal
@@ -289,7 +298,7 @@ export const Trucks = () => {
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none disabled:opacity-50"
+              className="font-display tracking-wide uppercase text-sm font-semibold text-steel-900 bg-safety-amber hover:bg-yellow-500 rounded-lg px-5 py-2.5 focus:outline-none disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? 'Menyimpan...' : 'Simpan'}
             </button>

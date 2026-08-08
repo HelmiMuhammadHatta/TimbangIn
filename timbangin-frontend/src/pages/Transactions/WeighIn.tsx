@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { AnprCapture } from '../../components/Weighbridge/AnprCapture';
 import axiosInstance from '../../api/axiosInstance';
 import { TicketPrint } from '../../components/Weighbridge/TicketPrint';
-
+import WeighbridgeDisplay from '../../components/Weighbridge/WeighbridgeDisplay';
 export const WeighIn: React.FC = () => {
     const location = useLocation();
     const [customers, setCustomers] = useState<any[]>([]);
@@ -193,32 +193,32 @@ export const WeighIn: React.FC = () => {
 
     return (
         <div className="space-y-6 print:hidden">
-            <h1 className="text-2xl font-semibold text-gray-900">Timbang Masuk (Weigh-In)</h1>
+            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100 uppercase tracking-wide">Timbang Masuk (Weigh-In)</h1>
             
             {error && (
-                <div className="bg-red-50 p-4 rounded-md">
-                    <p className="text-sm text-red-700">{error}</p>
+                <div className="bg-red-50 dark:bg-alert-red/10 p-4 rounded-lg border border-red-200 dark:border-alert-red/20">
+                    <p className="text-sm text-red-700 dark:text-alert-red font-medium">{error}</p>
                 </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Kiri: ANPR & Data Form */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">1. Identifikasi Truk (ANPR)</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">1. Identifikasi Truk (ANPR)</h2>
                         <AnprCapture onDetectResult={handleAnprResult} showProceedButton={false} />
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">2. Detail Transaksi</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">2. Detail Transaksi</h2>
                         <form id="weighInForm" onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Truk / Plat Nomor</label>
+                                <label className="block text-sm font-medium text-gray-900 dark:text-steel-100">Truk / Plat Nomor</label>
                                 <select
                                     value={selectedTruckId}
                                     onChange={(e) => setSelectedTruckId(e.target.value)}
                                     required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5 mt-1"
                                 >
                                     <option value="">-- Pilih Truk --</option>
                                     {trucks.map(t => (
@@ -228,12 +228,12 @@ export const WeighIn: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Pelanggan</label>
+                                <label className="block text-sm font-medium text-gray-900 dark:text-steel-100">Pelanggan</label>
                                 <select
                                     value={selectedCustomerId}
                                     onChange={(e) => setSelectedCustomerId(e.target.value)}
                                     required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5 mt-1"
                                 >
                                     <option value="">-- Pilih Pelanggan --</option>
                                     {customers.map(c => (
@@ -243,12 +243,12 @@ export const WeighIn: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Material</label>
+                                <label className="block text-sm font-medium text-gray-900 dark:text-steel-100">Material</label>
                                 <select
                                     value={selectedMaterialId}
                                     onChange={(e) => setSelectedMaterialId(e.target.value)}
                                     required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5 mt-1"
                                 >
                                     <option value="">-- Pilih Material --</option>
                                     {materials.map(m => (
@@ -258,12 +258,12 @@ export const WeighIn: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Tipe Transaksi</label>
+                                <label className="block text-sm font-medium text-gray-900 dark:text-steel-100">Tipe Transaksi</label>
                                 <select
                                     value={transactionType}
                                     onChange={(e) => setTransactionType(e.target.value)}
                                     required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    className="bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5 mt-1"
                                 >
                                     <option value="1">Masuk Isi → Keluar Kosong (Bongkar)</option>
                                     <option value="2">Masuk Kosong → Keluar Isi (Muat)</option>
@@ -275,23 +275,20 @@ export const WeighIn: React.FC = () => {
 
                 {/* Kanan: Weighbridge Display */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">3. Timbangan Aktif</h2>
-                        {/* Re-use WeighbridgeMonitor logic or integrate SignalR here.
-                            For simplicity, we assume WeighbridgeMonitor exposes its state 
-                            or we duplicate the SignalR hook. Let's just create a self-contained listener. */}
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">3. Timbangan Aktif</h2>
                         <WeighbridgeDisplay onWeightChange={handleWeightChange} />
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">4. Konfirmasi</h2>
-                        <div className="bg-gray-50 p-4 rounded-md mb-4">
-                            <p className="text-sm text-gray-500">Berat Masuk:</p>
-                            <p className={`text-3xl font-mono font-bold ${isWeightStable ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">4. Konfirmasi</h2>
+                        <div className="bg-gray-50 dark:bg-steel-900 p-4 rounded-lg border border-gray-200 dark:border-steel-700 mb-4">
+                            <p className="text-sm font-display text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide mb-1">Berat Masuk:</p>
+                            <p className={`text-3xl font-mono font-bold ${isWeightStable ? 'text-signal-green' : 'text-alert-red'}`}>
                                 {currentWeight} Kg
                             </p>
                             {!isWeightStable && (
-                                <p className="text-xs text-red-500 mt-1 animate-pulse">Menunggu berat stabil...</p>
+                                <p className="text-xs text-alert-red mt-1 animate-pulse font-display">Menunggu berat stabil...</p>
                             )}
                         </div>
                         
@@ -299,83 +296,12 @@ export const WeighIn: React.FC = () => {
                             type="submit"
                             form="weighInForm"
                             disabled={isSubmitting || !isWeightStable}
-                            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                                ${(!isWeightStable || isSubmitting) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'}`}
+                            className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-display font-bold uppercase tracking-wide 
+                                ${(!isWeightStable || isSubmitting) ? 'bg-gray-300 dark:bg-steel-700 text-gray-500 cursor-not-allowed' : 'bg-signal-green hover:bg-green-500 text-steel-900 transition-colors'}`}
                         >
                             {isSubmitting ? 'Menyimpan...' : 'Konfirmasi Timbang Masuk'}
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// A helper component to subscribe to SignalR and display weight
-import * as signalR from '@microsoft/signalr';
-
-const WeighbridgeDisplay: React.FC<{ onWeightChange: (weight: number, isStable: boolean) => void }> = ({ onWeightChange }) => {
-    const [weight, setWeight] = useState(0);
-    const [isStable, setIsStable] = useState(false);
-    const [status, setStatus] = useState('Disconnected');
-
-    useEffect(() => {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5266/hubs/weighbridge")
-            .withAutomaticReconnect()
-            .build();
-
-        connection.on("WeightUpdate", (data: any) => {
-            setWeight(data.weightKg);
-            setIsStable(data.isStable);
-            onWeightChange(data.weightKg, data.isStable);
-        });
-
-        const start = async () => {
-            try {
-                await connection.start();
-                setStatus('Connected');
-                await connection.invoke("SubscribeToWeight");
-            } catch (err) {
-                console.error("SignalR Connection Error: ", err);
-                setStatus('Error');
-            }
-        };
-
-        connection.onreconnected(() => {
-            connection.invoke("SubscribeToWeight").catch(console.error);
-        });
-
-        start();
-
-        return () => {
-            connection.stop();
-        };
-    }, [onWeightChange]);
-
-    return (
-        <div className="bg-black rounded-lg p-6 relative overflow-hidden">
-            <div className="absolute top-2 right-4 flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${status === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="text-xs text-gray-400">{status}</span>
-            </div>
-            
-            <div className="text-center mt-4">
-                <div className="text-gray-400 text-sm tracking-widest mb-2">DIGITAL INDICATOR</div>
-                <div className={`font-mono text-5xl md:text-7xl tracking-wider mb-2 ${isStable ? 'text-green-500' : 'text-red-500'}`}>
-                    {weight.toString().padStart(5, '0')}
-                </div>
-                <div className="text-gray-500 text-lg">KG</div>
-            </div>
-
-            <div className="mt-8 flex justify-between px-4 border-t border-gray-800 pt-4">
-                <div className="text-center">
-                    <div className="text-gray-500 text-xs mb-1">STABLE</div>
-                    <div className={`w-3 h-3 rounded-full mx-auto ${isStable ? 'bg-green-500' : 'bg-gray-700'}`}></div>
-                </div>
-                <div className="text-center">
-                    <div className="text-gray-500 text-xs mb-1">ZERO</div>
-                    <div className={`w-3 h-3 rounded-full mx-auto ${weight === 0 ? 'bg-yellow-500' : 'bg-gray-700'}`}></div>
                 </div>
             </div>
         </div>

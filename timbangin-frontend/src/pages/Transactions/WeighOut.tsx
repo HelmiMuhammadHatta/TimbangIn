@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AnprCapture } from '../../components/Weighbridge/AnprCapture';
 import axiosInstance from '../../api/axiosInstance';
 import { TicketPrint } from '../../components/Weighbridge/TicketPrint';
-import * as signalR from '@microsoft/signalr';
+import WeighbridgeDisplay from '../../components/Weighbridge/WeighbridgeDisplay';
 
 export const WeighOut: React.FC = () => {
     const [pendingTransactions, setPendingTransactions] = useState<any[]>([]);
@@ -136,50 +136,50 @@ export const WeighOut: React.FC = () => {
 
     return (
         <div className="space-y-6 print:hidden">
-            <h1 className="text-2xl font-semibold text-gray-900">Timbang Keluar (Weigh-Out)</h1>
+            <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100 uppercase tracking-wide">Timbang Keluar (Weigh-Out)</h1>
             
             {error && (
-                <div className="bg-red-50 p-4 rounded-md">
-                    <p className="text-sm text-red-700">{error}</p>
+                <div className="bg-red-50 dark:bg-alert-red/10 p-4 rounded-lg border border-red-200 dark:border-alert-red/20">
+                    <p className="text-sm text-red-700 dark:text-alert-red font-medium">{error}</p>
                 </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Kiri: Daftar Antrean & ANPR */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">1. Identifikasi Otomatis (ANPR)</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">1. Identifikasi Otomatis (ANPR)</h2>
                         <AnprCapture onDetectResult={handleAnprResult} showProceedButton={false} />
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">Pilih Manual Transaksi (Opsional)</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">Pilih Manual Transaksi (Opsional)</h2>
                         <input
                             type="text"
                             placeholder="Cari No Plat atau Tiket..."
-                            className="mb-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            className="mb-4 bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber block w-full p-2.5"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
-                        <div className="max-h-64 overflow-y-auto border border-gray-200 rounded">
+                        <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-steel-700 rounded-lg custom-scrollbar">
                             {filteredTransactions.length === 0 ? (
-                                <div className="p-4 text-center text-gray-500">Tidak ada antrean timbang keluar.</div>
+                                <div className="p-4 text-center text-gray-500 dark:text-gray-400 font-display">Tidak ada antrean timbang keluar.</div>
                             ) : (
-                                <ul className="divide-y divide-gray-200">
+                                <ul className="divide-y divide-gray-200 dark:divide-steel-700">
                                     {filteredTransactions.map(t => (
                                         <li 
                                             key={t.id} 
-                                            className={`p-4 cursor-pointer hover:bg-gray-50 ${selectedTransaction?.id === t.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                                            className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-steel-700/50 ${selectedTransaction?.id === t.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''}`}
                                             onClick={() => setSelectedTransaction(t)}
                                         >
                                             <div className="flex justify-between">
                                                 <div>
-                                                    <p className="text-sm font-medium text-gray-900">{t.truckPlateNumber}</p>
-                                                    <p className="text-xs text-gray-500">{t.ticketNumber} - {t.customerName}</p>
+                                                    <p className="text-sm font-mono font-bold text-gray-900 dark:text-steel-100">{t.truckPlateNumber}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">{t.ticketNumber} - <span className="font-sans">{t.customerName}</span></p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-sm font-semibold">{t.weighInKg} Kg</p>
-                                                    <p className="text-xs text-gray-400">Timbang Masuk</p>
+                                                    <p className="text-sm font-mono font-bold text-gray-900 dark:text-steel-100">{t.weighInKg} Kg</p>
+                                                    <p className="text-xs font-display font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-1">Timbang Masuk</p>
                                                 </div>
                                             </div>
                                         </li>
@@ -192,115 +192,57 @@ export const WeighOut: React.FC = () => {
 
                 {/* Kanan: Timbangan & Konfirmasi */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">2. Timbangan Aktif</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">2. Timbangan Aktif</h2>
                         <WeighbridgeDisplay onWeightChange={handleWeightChange} />
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-medium mb-4">3. Konfirmasi Timbang Keluar</h2>
+                    <div className="bg-white dark:bg-steel-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-steel-700">
+                        <h2 className="text-lg font-display font-bold text-gray-900 dark:text-steel-100 mb-4 tracking-wide uppercase">3. Konfirmasi Timbang Keluar</h2>
                         
                         {selectedTransaction ? (
-                            <div className="bg-gray-50 p-4 rounded-md mb-4 text-sm space-y-2 border border-gray-200">
-                                <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Truk:</span>
-                                    <span className="font-semibold">{selectedTransaction.truckPlateNumber}</span>
+                            <div className="bg-gray-50 dark:bg-steel-900 p-4 rounded-lg mb-4 text-sm space-y-2 border border-gray-200 dark:border-steel-700">
+                                <div className="flex justify-between border-b border-gray-200 dark:border-steel-700 pb-2">
+                                    <span className="text-gray-500 dark:text-gray-400 font-display font-semibold uppercase tracking-wide">Truk:</span>
+                                    <span className="font-mono font-bold text-gray-900 dark:text-steel-100">{selectedTransaction.truckPlateNumber}</span>
                                 </div>
-                                <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Material:</span>
-                                    <span className="font-semibold">{selectedTransaction.materialTypeName}</span>
+                                <div className="flex justify-between border-b border-gray-200 dark:border-steel-700 pb-2">
+                                    <span className="text-gray-500 dark:text-gray-400 font-display font-semibold uppercase tracking-wide">Material:</span>
+                                    <span className="font-semibold text-gray-900 dark:text-steel-100">{selectedTransaction.materialTypeName}</span>
                                 </div>
-                                <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-500">Timbang Masuk:</span>
-                                    <span className="font-semibold text-gray-700">{selectedTransaction.weighInKg} Kg</span>
+                                <div className="flex justify-between border-b border-gray-200 dark:border-steel-700 pb-2">
+                                    <span className="text-gray-500 dark:text-gray-400 font-display font-semibold uppercase tracking-wide">Timbang Masuk:</span>
+                                    <span className="font-mono font-bold text-gray-700 dark:text-steel-300">{selectedTransaction.weighInKg} Kg</span>
                                 </div>
                                 <div className="flex justify-between pt-2">
-                                    <span className="text-gray-500 font-medium">Timbang Keluar (Aktif):</span>
-                                    <span className={`font-bold ${isWeightStable ? 'text-green-600' : 'text-red-600'}`}>
+                                    <span className="text-gray-500 dark:text-gray-400 font-display font-semibold uppercase tracking-wide">Timbang Keluar (Aktif):</span>
+                                    <span className={`font-mono font-bold ${isWeightStable ? 'text-signal-green' : 'text-alert-red'}`}>
                                         {currentWeight} Kg
                                     </span>
                                 </div>
                                 <div className="flex justify-between pt-2">
-                                    <span className="text-gray-900 font-bold text-lg">Estimasi Netto:</span>
-                                    <span className="text-blue-600 font-bold text-lg">
+                                    <span className="text-gray-900 dark:text-white font-display font-bold uppercase tracking-wide text-lg">Estimasi Netto:</span>
+                                    <span className="text-blue-600 dark:text-blue-400 font-mono font-bold text-lg">
                                         {Math.abs(selectedTransaction.weighInKg - currentWeight)} Kg
                                     </span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-yellow-50 p-4 rounded-md mb-4 text-yellow-700 text-sm">
-                                Silakan identifikasi dengan ANPR atau pilih transaksi dari daftar di sebelah kiri.
+                            <div className="bg-yellow-50 dark:bg-safety-amber/10 p-4 rounded-lg mb-4 border border-yellow-200 dark:border-safety-amber/20">
+                                <p className="text-yellow-700 dark:text-safety-amber text-sm font-display font-medium">Silakan identifikasi dengan ANPR atau pilih transaksi dari daftar di sebelah kiri.</p>
                             </div>
                         )}
                         
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || !isWeightStable || !selectedTransaction}
-                            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                                ${(!isWeightStable || isSubmitting || !selectedTransaction) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'}`}
+                            className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-display font-bold uppercase tracking-wide 
+                                ${(!isWeightStable || isSubmitting || !selectedTransaction) ? 'bg-gray-300 dark:bg-steel-700 text-gray-500 cursor-not-allowed' : 'bg-signal-green hover:bg-green-500 text-steel-900 transition-colors'}`}
                         >
                             {isSubmitting ? 'Menyimpan...' : 'Konfirmasi Timbang Keluar'}
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-};
-
-// Re-using the isolated WeighbridgeDisplay component
-const WeighbridgeDisplay: React.FC<{ onWeightChange: (weight: number, isStable: boolean) => void }> = ({ onWeightChange }) => {
-    const [weight, setWeight] = useState(0);
-    const [isStable, setIsStable] = useState(false);
-    const [status, setStatus] = useState('Disconnected');
-
-    useEffect(() => {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5266/hubs/weighbridge")
-            .withAutomaticReconnect()
-            .build();
-
-        connection.on("WeightUpdate", (data: any) => {
-            setWeight(data.weightKg);
-            setIsStable(data.isStable);
-            onWeightChange(data.weightKg, data.isStable);
-        });
-
-        const start = async () => {
-            try {
-                await connection.start();
-                setStatus('Connected');
-                await connection.invoke("SubscribeToWeight");
-            } catch (err) {
-                console.error("SignalR Connection Error: ", err);
-                setStatus('Error');
-            }
-        };
-
-        connection.onreconnected(() => {
-            connection.invoke("SubscribeToWeight").catch(console.error);
-        });
-
-        start();
-
-        return () => {
-            connection.stop();
-        };
-    }, [onWeightChange]);
-
-    return (
-        <div className="bg-black rounded-lg p-6 relative overflow-hidden">
-            <div className="absolute top-2 right-4 flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${status === 'Connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="text-xs text-gray-400">{status}</span>
-            </div>
-            
-            <div className="text-center mt-4">
-                <div className="text-gray-400 text-sm tracking-widest mb-2">DIGITAL INDICATOR</div>
-                <div className={`font-mono text-5xl tracking-wider mb-2 ${isStable ? 'text-green-500' : 'text-red-500'}`}>
-                    {weight.toString().padStart(5, '0')}
-                </div>
-                <div className="text-gray-500 text-lg">KG</div>
             </div>
         </div>
     );

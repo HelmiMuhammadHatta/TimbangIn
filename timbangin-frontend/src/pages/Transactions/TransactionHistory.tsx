@@ -76,26 +76,25 @@ export const TransactionHistory: React.FC = () => {
             <div className="print:hidden">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">
-                        <h1 className="text-xl font-semibold text-gray-900">Riwayat Transaksi Timbang</h1>
-                        <p className="mt-2 text-sm text-gray-700">Daftar seluruh transaksi yang masuk ke sistem.</p>
+                        <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-steel-100 uppercase tracking-wide">Riwayat Transaksi Timbang</h1>
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-display">Daftar seluruh transaksi yang masuk ke sistem.</p>
                     </div>
                 </div>
                 
-                {/* Filters */}
                 <div className="mt-4 flex flex-col md:flex-row gap-4 mb-4">
                     <form onSubmit={handleSearch} className="flex-1 flex gap-2">
                         <input
                             type="text"
                             placeholder="Cari Plat Nomor atau No Tiket..."
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                            className="block w-full bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber p-2.5"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded shadow text-sm hover:bg-blue-700">Cari</button>
+                        <button type="submit" className="bg-steel-800 hover:bg-steel-700 dark:bg-steel-700 dark:hover:bg-steel-600 text-white font-display font-semibold px-4 py-2 rounded-lg shadow-sm text-sm uppercase tracking-wide transition-colors">Cari</button>
                     </form>
                     
                     <select
-                        className="block w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                        className="block w-48 bg-gray-50 dark:bg-steel-900 border border-gray-300 dark:border-steel-700 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-safety-amber focus:border-safety-amber p-2.5"
                         value={statusFilter}
                         onChange={(e) => {
                             setStatusFilter(e.target.value);
@@ -109,59 +108,59 @@ export const TransactionHistory: React.FC = () => {
                     </select>
                 </div>
 
-                <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                <div className="bg-white dark:bg-steel-800 shadow-sm overflow-hidden sm:rounded-xl border border-gray-200 dark:border-steel-700">
                     {loading ? (
-                        <div className="p-10 text-center text-gray-500">Memuat data...</div>
+                        <div className="p-10 text-center text-gray-500 dark:text-gray-400 font-display uppercase tracking-wider">Memuat data...</div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-x-auto custom-scrollbar">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-steel-700">
+                                <thead className="bg-gray-50 dark:bg-steel-900 border-b border-gray-200 dark:border-steel-700">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiket</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truk / Pelanggan</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Material</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
-                                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Berat (In / Out / Netto)</th>
-                                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tiket</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Truk / Pelanggan</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Material</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Waktu</th>
+                                        <th scope="col" className="px-6 py-3 text-right text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Berat (In / Out / Netto)</th>
+                                        <th scope="col" className="px-6 py-3 text-center text-xs font-display font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                         <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-steel-800 divide-y divide-gray-200 dark:divide-steel-700">
                                     {transactions.map((t) => (
-                                        <tr key={t.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{t.ticketNumber}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <div className="font-semibold text-gray-900">{t.truckPlateNumber}</div>
-                                                <div className="text-xs">{t.customerName}</div>
+                                        <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-steel-700/50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-mono font-bold text-gray-900 dark:text-steel-100">{t.ticketNumber}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                <div className="font-mono font-bold text-gray-900 dark:text-steel-100">{t.truckPlateNumber}</div>
+                                                <div className="text-xs font-sans">{t.customerName}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.materialTypeName}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 font-medium">{t.materialTypeName}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">
                                                 <div>{new Date(t.weighInTimestamp).toLocaleDateString('id-ID')}</div>
                                                 <div className="text-xs">{new Date(t.weighInTimestamp).toLocaleTimeString('id-ID')}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400 font-mono">
                                                 <div>In: {t.weighInKg} Kg</div>
                                                 {t.weighOutKg !== null && <div>Out: {t.weighOutKg} Kg</div>}
-                                                {t.nettoKg !== null && <div className="font-bold text-blue-600 mt-1">Netto: {t.nettoKg} Kg</div>}
+                                                {t.nettoKg !== null && <div className="font-bold text-blue-600 dark:text-blue-400 mt-1 font-display tracking-wider">NETTO: <span className="font-mono">{t.nettoKg} Kg</span></div>}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
-                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    ${t.status === 'Selesai' ? 'bg-green-100 text-green-800' : 
-                                                    t.status === 'MenungguTimbangKeluar' ? 'bg-yellow-100 text-yellow-800' : 
-                                                    'bg-red-100 text-red-800'}`}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-display">
+                                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-bold uppercase tracking-wider rounded-full 
+                                                    ${t.status === 'Selesai' ? 'bg-signal-green/20 text-green-700 dark:text-signal-green border border-signal-green/30' : 
+                                                    t.status === 'MenungguTimbangKeluar' ? 'bg-safety-amber/20 text-yellow-700 dark:text-safety-amber border border-safety-amber/30' : 
+                                                    'bg-alert-red/20 text-red-700 dark:text-alert-red border border-alert-red/30'}`}>
                                                     {t.status === 'MenungguTimbangKeluar' ? 'Pending' : t.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button onClick={() => handlePrintClick(t)} className="text-blue-600 hover:text-blue-900 mx-2">Print</button>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium font-display">
+                                                <button onClick={() => handlePrintClick(t)} className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mx-2 uppercase tracking-wide text-xs font-bold">Print</button>
                                                 {t.status === 'MenungguTimbangKeluar' && (
-                                                    <button onClick={() => handleCancelTransaction(t.id)} className="text-red-600 hover:text-red-900 mx-2">Batal</button>
+                                                    <button onClick={() => handleCancelTransaction(t.id)} className="text-alert-red hover:text-red-900 dark:hover:text-red-400 mx-2 uppercase tracking-wide text-xs font-bold">Batal</button>
                                                 )}
                                             </td>
                                         </tr>
                                     ))}
                                     {transactions.length === 0 && (
-                                        <tr><td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">Tidak ada data ditemukan</td></tr>
+                                        <tr><td colSpan={7} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400 font-display">Tidak ada data ditemukan</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -170,20 +169,20 @@ export const TransactionHistory: React.FC = () => {
                 </div>
                 
                 {/* Pagination */}
-                <div className="mt-4 flex justify-between items-center">
-                    <span className="text-sm text-gray-700">Halaman {page} dari {totalPages || 1}</span>
+                <div className="mt-4 flex justify-between items-center font-display">
+                    <span className="text-sm text-gray-700 dark:text-gray-400 font-medium">Halaman {page} dari {totalPages || 1}</span>
                     <div className="space-x-2">
                         <button 
                             disabled={page <= 1} 
                             onClick={() => setPage(p => p - 1)}
-                            className="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded shadow-sm text-sm disabled:opacity-50"
+                            className="bg-white dark:bg-steel-800 border border-gray-300 dark:border-steel-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg shadow-sm text-sm disabled:opacity-50 font-semibold uppercase tracking-wide hover:bg-gray-50 dark:hover:bg-steel-700 transition-colors"
                         >
                             Sebelumnya
                         </button>
                         <button 
                             disabled={page >= totalPages || totalPages === 0} 
                             onClick={() => setPage(p => p + 1)}
-                            className="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded shadow-sm text-sm disabled:opacity-50"
+                            className="bg-white dark:bg-steel-800 border border-gray-300 dark:border-steel-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg shadow-sm text-sm disabled:opacity-50 font-semibold uppercase tracking-wide hover:bg-gray-50 dark:hover:bg-steel-700 transition-colors"
                         >
                             Selanjutnya
                         </button>
